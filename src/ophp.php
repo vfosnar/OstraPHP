@@ -1,0 +1,66 @@
+#!/usr/bin/php
+<?php
+
+include_once "transpilator.php" ;
+
+function projdiSlozku(string $cesta) {
+    $cesta = realpath($cesta) ;
+    if ($cesta === false)
+        die("složka v zadané cestě neexistuje\n") ;
+    
+    $frontaSlozek = array($cesta) ;
+    $soubory = array() ;
+
+    while (count($frontaSlozek) > 0) {
+        $cesta = array_shift($frontaSlozek) ;
+
+        $drzakSlozky = opendir($cesta) ;
+        while (($predmet = readdir($drzakSlozky)) !== false) {
+            if ($predmet === "." || $predmet === "..")
+                continue ;
+
+            $cestaKPredmetu = $cesta . "/" . $predmet ;
+            if (is_file($cestaKPredmetu))
+                array_push($soubory, $cestaKPredmetu) ;
+            else if (is_dir($cestaKPredmetu))
+                array_push($frontaSlozek, $cestaKPredmetu) ;
+        }
+        closedir($drzakSlozky) ;
+    }
+
+    return $soubory ;
+}
+
+function normalizovat_cestu(string $cesta) {
+    return realpath(".") . "/" . rtrim($cesta) ;
+}
+
+$zdrojova_slozka = "." ;
+if (count($argv) > 1)
+    $zdrojova_slozka = $argv[1] ;
+$zdrojova_slozka = normalizovat_cestu($zdrojova_slozka) ;
+
+$vystupni_slozka = "." ;
+if (count($argv) > 2)
+    $vystupni_slozka = $argv[2] ;
+$vystupni_slozka = normalizovat_cestu($vystupni_slozka) ;
+
+$soubory = projdiSlozku($zdrojova_slozka) ;
+foreach ($soubory as $soubor) {
+    if (!str_ends_with($soubor, ".ophp"))
+        continue ;
+
+    $ostraphp_kod = file_get_contents($soubor) ;
+    $transpilator = new Transpilator($ostraphp_kod) ;
+    $php_kod = $transpilator->transpilovat() ;
+
+    $relativni_soubor = mb_substr($soubor, mb_strlen($zdrojova_slozka)) ;
+    $relativni_php_soubor = mb_substr($relativni_soubor, 0, mb_strlen($relativni_soubor) - mb_strlen(".ophp")) . ".php" ;
+    $absolutni_php_soubor = $vystupni_slozka . $relativni_php_soubor ;
+
+    $slozka = dirname($absolutni_php_soubor) ;
+    if (!file_exists($slozka))
+        mkdir($slozka, 0777, true) ;
+    
+    file_put_contents($absolutni_php_soubor, $php_kod) ;
+}

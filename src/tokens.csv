@@ -1,0 +1,48 @@
+
+davaj,  return
+cotoe,  var_dump
+povedz, echo
+pyco,   ;
+toz,    define
+zomri,  die
+
+// array
+pole,               array
+pole_ma_klic,       array_key_exists
+pole_ma_hodnotu,    in_array
+
+// IO
+citaj, file_get_contents
+pisaj, file_put_contents
+
+// data types
+bul,                bool
+cyslo,              int
+cyslo_desetinne,    float
+dryst,              string
+
+// data values
+fajne,              true
+nyt,                false
+chuj,               null
+
+// control structures
+kaj,                if
+koneckaj,           endif
+kajtez,             else if
+boinak,             else
+rubat,              while
+zdybat,             break
+dlabat,             continue
+
+// OOP-related stuff
+moe,        private
+tryda,      class
+mezigzycht, interface
+makacenko,  function
+kuka,       implements
+fagan_od,   extends
+__rynek,    __construct
+$joch,      $this
+forant,     parent
+zrob,       new

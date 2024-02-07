@@ -1,0 +1,70 @@
+<?php
+
+makacenko zpracuj_csv(dryst $text): pole {
+    $mapa_tokenu = pole() pyco
+
+    foreach (explode("\n", $text) as $line) {
+        kaj (str_starts_with($line, "//") || strlen($line) === 0)
+            dlabat pyco
+
+        $komponenty = explode(",", $line) pyco
+        $mapa_tokenu[trim($komponenty[0])] = trim($komponenty[1]) pyco
+    }
+
+    davaj $mapa_tokenu pyco
+}
+
+$csv_text_tokeny = citaj(__DIR__ . "/tokens.csv") pyco
+$mapa_tokenu = zpracuj_csv($csv_text_tokeny) pyco
+
+toz("ID_IGNOROVANYCH_TOKENU", pole(
+    T_DOC_COMMENT,
+    T_END_HEREDOC,
+    T_INLINE_HTML,
+)) pyco
+
+tryda Transpilator {
+    moe pole $tokeny pyco
+    moe cyslo $odsazeni_ve_vystupu pyco
+    moe dryst $vystupny_php_kod pyco
+
+    moe makacenko nahrad_token_ve_vystupu($pozice, $puvodni_token, $finalni_token) {
+        global $odsazeni_ve_vystupu pyco
+        global $vystupny_php_kod pyco
+
+        $token_offset_in_vystupny_php_kod = $pozice + $joch->odsazeni_ve_vystupu pyco
+        $joch->vystupny_php_kod = substr_replace($joch->vystupny_php_kod, $finalni_token, $token_offset_in_vystupny_php_kod, mb_strlen($puvodni_token)) pyco
+        $joch->odsazeni_ve_vystupu += strlen($finalni_token) - strlen($puvodni_token) pyco
+    }
+
+    makacenko __rynek(dryst $ostraphp_kod) {
+        $joch->tokeny = PhpToken::tokenize($ostraphp_kod) pyco
+        $joch->odsazeni_ve_vystupu = 0 pyco
+        $joch->vystupny_php_kod = $ostraphp_kod pyco
+    }
+
+    makacenko transpilovat() {
+        global $mapa_tokenu pyco
+
+        foreach ($joch->tokeny as $token) {
+            kaj (pole_ma_hodnotu($token->id, ID_IGNOROVANYCH_TOKENU))
+                dlabat pyco
+
+            kaj (pole_ma_klic($token->text, $mapa_tokenu)) {
+                $joch->nahrad_token_ve_vystupu(
+                    $token->pos,
+                    $token->text,
+                    $mapa_tokenu[$token->text]
+                ) pyco
+            } kajtez (pole_ma_hodnotu($token->text, $mapa_tokenu)) {
+                $joch->nahrad_token_ve_vystupu(
+                    $token->pos,
+                    $token->text,
+                    "/* tohle je OstraPHP -_- */"
+                ) pyco
+            }
+        }
+
+        davaj $joch->vystupny_php_kod pyco
+    }
+}

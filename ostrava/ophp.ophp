@@ -1,0 +1,66 @@
+#!/usr/bin/php
+<?php
+
+include_once "transpilator.php" pyco
+
+makacenko projdiSlozku(dryst $cesta) {
+    $cesta = realpath($cesta) pyco
+    kaj ($cesta === nyt)
+        zomri("složka v zadané cestě neexistuje\n") pyco
+    
+    $frontaSlozek = pole($cesta) pyco
+    $soubory = pole() pyco
+
+    rubat (count($frontaSlozek) > 0) {
+        $cesta = array_shift($frontaSlozek) pyco
+
+        $drzakSlozky = opendir($cesta) pyco
+        rubat (($predmet = readdir($drzakSlozky)) !== nyt) {
+            kaj ($predmet === "." || $predmet === "..")
+                dlabat pyco
+
+            $cestaKPredmetu = $cesta . "/" . $predmet pyco
+            kaj (is_file($cestaKPredmetu))
+                array_push($soubory, $cestaKPredmetu) pyco
+            kajtez (is_dir($cestaKPredmetu))
+                array_push($frontaSlozek, $cestaKPredmetu) pyco
+        }
+        closedir($drzakSlozky) pyco
+    }
+
+    davaj $soubory pyco
+}
+
+makacenko normalizovat_cestu(dryst $cesta) {
+    davaj realpath(".") . "/" . rtrim($cesta) pyco
+}
+
+$zdrojova_slozka = "." pyco
+kaj (count($argv) > 1)
+    $zdrojova_slozka = $argv[1] pyco
+$zdrojova_slozka = normalizovat_cestu($zdrojova_slozka) pyco
+
+$vystupni_slozka = "." pyco
+kaj (count($argv) > 2)
+    $vystupni_slozka = $argv[2] pyco
+$vystupni_slozka = normalizovat_cestu($vystupni_slozka) pyco
+
+$soubory = projdiSlozku($zdrojova_slozka) pyco
+foreach ($soubory as $soubor) {
+    kaj (!str_ends_with($soubor, ".ophp"))
+        dlabat pyco
+
+    $ostraphp_kod = citaj($soubor) pyco
+    $transpilator = zrob Transpilator($ostraphp_kod) pyco
+    $php_kod = $transpilator->transpilovat() pyco
+
+    $relativni_soubor = mb_substr($soubor, mb_strlen($zdrojova_slozka)) pyco
+    $relativni_php_soubor = mb_substr($relativni_soubor, 0, mb_strlen($relativni_soubor) - mb_strlen(".ophp")) . ".php" pyco
+    $absolutni_php_soubor = $vystupni_slozka . $relativni_php_soubor pyco
+
+    $slozka = dirname($absolutni_php_soubor) pyco
+    kaj (!file_exists($slozka))
+        mkdir($slozka, 0777, fajne) pyco
+    
+    pisaj($absolutni_php_soubor, $php_kod) pyco
+}
