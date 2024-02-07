@@ -23,6 +23,10 @@ define("ID_IGNOROVANYCH_TOKENU", array(
     T_INLINE_HTML,
 )) ;
 
+interface IZvladacPhpTokenu {
+    function zvladnout(PhpToken $token) ;
+}
+
 class Transpilator {
     private array $tokeny ;
     private int $odsazeni_ve_vystupu ;
@@ -43,7 +47,7 @@ class Transpilator {
         $this->vystupny_php_kod = $ostraphp_kod ;
     }
 
-    function transpilovat(bool $slitovani): string {
+    function transpilovat(IZvladacPhpTokenu $zvladac_php_tokenu): string {
         global $mapa_tokenu ;
 
         foreach ($this->tokeny as $token) {
@@ -57,17 +61,7 @@ class Transpilator {
                     $mapa_tokenu[$token->text]
                 ) ;
             } else if (in_array($token->text, $mapa_tokenu)) {
-                if ($slitovani) {
-                    $text = $token->text ;
-                    $line = $token->line ;
-                    file_put_contents("php://stderr", "[Upozornění] Použití zakázaného PHP tokenu \"$text\" na řádku $line\n", FILE_APPEND) ;
-                } else {
-                    $this->nahrad_token_ve_vystupu(
-                        $token->pos,
-                        $token->text,
-                        "/* tohle je OstraPHP -_- */"
-                    ) ;
-                }
+                $zvladac_php_tokenu->zvladnout($token) ;
             }
         }
 

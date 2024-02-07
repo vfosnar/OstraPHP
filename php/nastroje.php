@@ -1,5 +1,7 @@
 <?php
 
+require_once "transpilator.php" ;
+
 function projit_slozku(string $cesta): array {
     $cesta = realpath($cesta) ;
     if ($cesta === false)
@@ -38,4 +40,24 @@ function normalizovat_cestu(string $cesta): string | false {
 
 function nahradit_koncovku(string $cesta, string $puvodni_koncovka, string $nova_koncovka): string {
     return mb_substr($cesta, 0, mb_strlen($cesta) - mb_strlen($puvodni_koncovka)) . $nova_koncovka ;
+}
+
+class ZvladacPhpTokenu implements IZvladacPhpTokenu {
+    private $slitovani ;
+
+    function __construct(bool $slitovani) {
+        $this->slitovani = $slitovani ;
+    }
+
+    function zvladnout(PhpToken $token) {
+        $text = $token->text ;
+        $line = $token->line ;
+        $zprava = "Použití zakázaného PHP tokenu \"$text\" na řádku $line\n" ;
+    
+        if ($this->slitovani) {
+            file_put_contents("php://stderr", "[Upozornění] $zprava", FILE_APPEND) ;
+        } else {
+            die("[Chyba] $zprava") ;
+        }
+    }
 }

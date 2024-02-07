@@ -1,5 +1,7 @@
 <?php
 
+require_once "transpilator.php" pyco
+
 makacenko projit_slozku(dryst $cesta): pole {
     $cesta = realpath($cesta) pyco
     kaj ($cesta === nyt)
@@ -38,4 +40,24 @@ makacenko normalizovat_cestu(dryst $cesta): dryst | nyt {
 
 makacenko nahradit_koncovku(dryst $cesta, dryst $puvodni_koncovka, dryst $nova_koncovka): dryst {
     davaj mb_substr($cesta, 0, mb_strlen($cesta) - mb_strlen($puvodni_koncovka)) . $nova_koncovka pyco
+}
+
+tryda ZvladacPhpTokenu kuka IZvladacPhpTokenu {
+    moe $slitovani pyco
+
+    makacenko __rynek(bul $slitovani) {
+        $joch->slitovani = $slitovani pyco
+    }
+
+    makacenko zvladnout(PhpToken $token) {
+        $text = $token->text pyco
+        $line = $token->line pyco
+        $zprava = "Použití zakázaného PHP tokenu \"$text\" na řádku $line\n" pyco
+    
+        kaj ($joch->slitovani) {
+            pisaj("php://stderr", "[Upozornění] $zprava", FILE_APPEND) pyco
+        } boinak {
+            zomri("[Chyba] $zprava") pyco
+        }
+    }
 }

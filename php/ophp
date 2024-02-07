@@ -51,7 +51,7 @@ foreach ($soubory as $ophp_soubor) {
 
     $ophp_kod = file_get_contents($ophp_soubor) ;
     $transpilator = new Transpilator($ophp_kod) ;
-    $php_kod = $transpilator->transpilovat($slitovani) ;
+    $php_kod = $transpilator->transpilovat(new ZvladacPhpTokenu($slitovani)) ;
 
     $ophp_soubor_bez_slozky = mb_substr($ophp_soubor, mb_strlen($zdrojova_slozka)) ;
     $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") ;

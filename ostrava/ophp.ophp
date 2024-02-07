@@ -51,7 +51,7 @@ foreach ($soubory as $ophp_soubor) {
 
     $ophp_kod = citaj($ophp_soubor) pyco
     $transpilator = zrob Transpilator($ophp_kod) pyco
-    $php_kod = $transpilator->transpilovat($slitovani) pyco
+    $php_kod = $transpilator->transpilovat(zrob ZvladacPhpTokenu($slitovani)) pyco
 
     $ophp_soubor_bez_slozky = mb_substr($ophp_soubor, mb_strlen($zdrojova_slozka)) pyco
     $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") pyco

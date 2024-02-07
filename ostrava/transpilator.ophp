@@ -23,6 +23,10 @@ toz("ID_IGNOROVANYCH_TOKENU", pole(
     T_INLINE_HTML,
 )) pyco
 
+mezigzycht IZvladacPhpTokenu {
+    makacenko zvladnout(PhpToken $token) pyco
+}
+
 tryda Transpilator {
     moe pole $tokeny pyco
     moe cyslo $odsazeni_ve_vystupu pyco
@@ -43,7 +47,7 @@ tryda Transpilator {
         $joch->vystupny_php_kod = $ostraphp_kod pyco
     }
 
-    makacenko transpilovat(bul $slitovani): dryst {
+    makacenko transpilovat(IZvladacPhpTokenu $zvladac_php_tokenu): dryst {
         global $mapa_tokenu pyco
 
         foreach ($joch->tokeny as $token) {
@@ -57,17 +61,7 @@ tryda Transpilator {
                     $mapa_tokenu[$token->text]
                 ) pyco
             } kajtez (pole_ma_hodnotu($token->text, $mapa_tokenu)) {
-                kaj ($slitovani) {
-                    $text = $token->text pyco
-                    $line = $token->line pyco
-                    pisaj("php://stderr", "[Upozornění] Použití zakázaného PHP tokenu \"$text\" na řádku $line\n", FILE_APPEND) pyco
-                } boinak {
-                    $joch->nahrad_token_ve_vystupu(
-                        $token->pos,
-                        $token->text,
-                        "/* tohle je OstraPHP -_- */"
-                    ) pyco
-                }
+                $zvladac_php_tokenu->zvladnout($token) pyco
             }
         }
 
