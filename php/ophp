@@ -1,70 +1,65 @@
 #!/usr/bin/php
 <?php
 
+require_once "nastroje.php" ;
 require_once "transpilator.php" ;
 
-function projdiSlozku(string $cesta) {
-    $cesta = realpath($cesta) ;
-    if ($cesta === false)
-        die("složka v zadané cestě neexistuje\n") ;
-    
-    $frontaSlozek = array($cesta) ;
-    $soubory = array() ;
+$kratke_moznosti = "" ;
+$kratke_moznosti .= "z::" ;
+$kratke_moznosti .= "v::" ;
+$kratke_moznosti .= "h" ;
+$kratke_moznosti .= "s" ;
 
-    while (count($frontaSlozek) > 0) {
-        $cesta = array_shift($frontaSlozek) ;
+$dlouhe_moznosti = array(
+    "help"
+) ;
 
-        $drzakSlozky = opendir($cesta) ;
-        while (($predmet = readdir($drzakSlozky)) !== false) {
-            if ($predmet === "." || $predmet === "..")
-                continue ;
+$konfigurace = getopt($kratke_moznosti, $dlouhe_moznosti) ;
 
-            $cestaKPredmetu = $cesta . "/" . $predmet ;
-            if (is_file($cestaKPredmetu))
-                array_push($soubory, $cestaKPredmetu) ;
-            else if (is_dir($cestaKPredmetu))
-                array_push($frontaSlozek, $cestaKPredmetu) ;
-        }
-        closedir($drzakSlozky) ;
-    }
+if (array_key_exists("h", $konfigurace) || array_key_exists("help", $konfigurace)) {
+    echo <<<EOT
+použití: ophp [možnosti]
 
-    return $soubory ;
+Bo neni cas pyco
+
+možnosti:
+    -h, --help      Zobrazí tuto nápovědu
+    -z              Určí zdrojovou složku s .ophp soubory
+    -v              Určí výslednou složku s vygenerovanými .php soubory
+    -s              Mód slitování, vypne cenzuru PHP tokenů
+
+EOT ;
+    return ;
 }
 
-// TODO: tohle není ideální implementace
-function normalizovat_cestu(string $cesta) {
-    if (str_starts_with($cesta, "/"))
-        return realpath(".") . "/" . rtrim($cesta) ;
-    else
-        return realpath($cesta) ;
-}
-
-$zdrojova_slozka = "." ;
-if (count($argv) > 1)
-    $zdrojova_slozka = $argv[1] ;
+$zdrojova_slozka = "" ;
+if (array_key_exists("z", $konfigurace))
+    $zdrojova_slozka = $konfigurace["z"] ;
 $zdrojova_slozka = normalizovat_cestu($zdrojova_slozka) ;
 
-$vystupni_slozka = "." ;
-if (count($argv) > 2)
-    $vystupni_slozka = $argv[2] ;
+$vystupni_slozka = "" ;
+if (array_key_exists("v", $konfigurace))
+    $vystupni_slozka = $konfigurace["v"] ;
 $vystupni_slozka = normalizovat_cestu($vystupni_slozka) ;
 
-$soubory = projdiSlozku($zdrojova_slozka) ;
-foreach ($soubory as $soubor) {
-    if (!str_ends_with($soubor, ".ophp"))
+$slitovani = array_key_exists("s", $konfigurace) ;
+
+$soubory = projit_slozku($zdrojova_slozka) ;
+foreach ($soubory as $ophp_soubor) {
+    if (!str_ends_with($ophp_soubor, ".ophp"))
         continue ;
 
-    $ostraphp_kod = file_get_contents($soubor) ;
-    $transpilator = new Transpilator($ostraphp_kod) ;
-    $php_kod = $transpilator->transpilovat() ;
+    $ophp_kod = file_get_contents($ophp_soubor) ;
+    $transpilator = new Transpilator($ophp_kod) ;
+    $php_kod = $transpilator->transpilovat($slitovani) ;
 
-    $relativni_soubor = mb_substr($soubor, mb_strlen($zdrojova_slozka)) ;
-    $relativni_php_soubor = mb_substr($relativni_soubor, 0, mb_strlen($relativni_soubor) - mb_strlen(".ophp")) . ".php" ;
-    $absolutni_php_soubor = $vystupni_slozka . $relativni_php_soubor ;
+    $ophp_soubor_bez_slozky = mb_substr($ophp_soubor, mb_strlen($zdrojova_slozka)) ;
+    $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") ;
+    $php_soubor = $vystupni_slozka . $php_soubor_bez_slozky ;
 
-    $slozka = dirname($absolutni_php_soubor) ;
+    $slozka = dirname($php_soubor) ;
     if (!file_exists($slozka))
         mkdir($slozka, 0777, true) ;
     
-    file_put_contents($absolutni_php_soubor, $php_kod) ;
+    file_put_contents($php_soubor, $php_kod) ;
 }

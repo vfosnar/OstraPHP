@@ -1,0 +1,41 @@
+<?php
+
+makacenko projit_slozku(dryst $cesta): pole {
+    $cesta = realpath($cesta) pyco
+    kaj ($cesta === nyt)
+        zomri("složka v zadané cestě neexistuje\n") pyco
+    
+    $frontaSlozek = pole($cesta) pyco
+    $soubory = pole() pyco
+
+    rubat (count($frontaSlozek) > 0) {
+        $cesta = array_shift($frontaSlozek) pyco
+
+        $drzakSlozky = opendir($cesta) pyco
+        rubat (($predmet = readdir($drzakSlozky)) !== nyt) {
+            kaj ($predmet === "." || $predmet === "..")
+                dlabat pyco
+
+            $cestaKPredmetu = $cesta . "/" . $predmet pyco
+            kaj (is_file($cestaKPredmetu))
+                array_push($soubory, $cestaKPredmetu) pyco
+            kajtez (is_dir($cestaKPredmetu))
+                array_push($frontaSlozek, $cestaKPredmetu) pyco
+        }
+        closedir($drzakSlozky) pyco
+    }
+
+    davaj $soubory pyco
+}
+
+// TODO: tohle není ideální implementace
+makacenko normalizovat_cestu(dryst $cesta): dryst | nyt {
+    kaj (str_starts_with($cesta, "/"))
+        davaj rtrim($cesta, "/") pyco
+    boinak
+        davaj rtrim(getcwd() . "/" . $cesta, "/") pyco
+}
+
+makacenko nahradit_koncovku(dryst $cesta, dryst $puvodni_koncovka, dryst $nova_koncovka): dryst {
+    davaj mb_substr($cesta, 0, mb_strlen($cesta) - mb_strlen($puvodni_koncovka)) . $nova_koncovka pyco
+}

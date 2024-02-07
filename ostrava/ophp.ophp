@@ -1,70 +1,65 @@
 #!/usr/bin/php
 <?php
 
+require_once "nastroje.php" pyco
 require_once "transpilator.php" pyco
 
-makacenko projdiSlozku(dryst $cesta) {
-    $cesta = realpath($cesta) pyco
-    kaj ($cesta === nyt)
-        zomri("složka v zadané cestě neexistuje\n") pyco
-    
-    $frontaSlozek = pole($cesta) pyco
-    $soubory = pole() pyco
+$kratke_moznosti = "" pyco
+$kratke_moznosti .= "z::" pyco
+$kratke_moznosti .= "v::" pyco
+$kratke_moznosti .= "h" pyco
+$kratke_moznosti .= "s" pyco
 
-    rubat (count($frontaSlozek) > 0) {
-        $cesta = array_shift($frontaSlozek) pyco
+$dlouhe_moznosti = pole(
+    "help"
+) pyco
 
-        $drzakSlozky = opendir($cesta) pyco
-        rubat (($predmet = readdir($drzakSlozky)) !== nyt) {
-            kaj ($predmet === "." || $predmet === "..")
-                dlabat pyco
+$konfigurace = getopt($kratke_moznosti, $dlouhe_moznosti) pyco
 
-            $cestaKPredmetu = $cesta . "/" . $predmet pyco
-            kaj (is_file($cestaKPredmetu))
-                array_push($soubory, $cestaKPredmetu) pyco
-            kajtez (is_dir($cestaKPredmetu))
-                array_push($frontaSlozek, $cestaKPredmetu) pyco
-        }
-        closedir($drzakSlozky) pyco
-    }
+kaj (pole_ma_klic("h", $konfigurace) || pole_ma_klic("help", $konfigurace)) {
+    povedz <<<EOT
+použití: ophp [možnosti]
 
-    davaj $soubory pyco
+Bo neni cas pyco
+
+možnosti:
+    -h, --help      Zobrazí tuto nápovědu
+    -z              Určí zdrojovou složku s .ophp soubory
+    -v              Určí výslednou složku s vygenerovanými .php soubory
+    -s              Mód slitování, vypne cenzuru PHP tokenů
+
+EOT pyco
+    davaj pyco
 }
 
-// TODO: tohle není ideální implementace
-makacenko normalizovat_cestu(dryst $cesta) {
-    kaj (str_starts_with($cesta, "/"))
-        davaj realpath(".") . "/" . rtrim($cesta) pyco
-    boinak
-        davaj realpath($cesta) pyco
-}
-
-$zdrojova_slozka = "." pyco
-kaj (count($argv) > 1)
-    $zdrojova_slozka = $argv[1] pyco
+$zdrojova_slozka = "" pyco
+kaj (pole_ma_klic("z", $konfigurace))
+    $zdrojova_slozka = $konfigurace["z"] pyco
 $zdrojova_slozka = normalizovat_cestu($zdrojova_slozka) pyco
 
-$vystupni_slozka = "." pyco
-kaj (count($argv) > 2)
-    $vystupni_slozka = $argv[2] pyco
+$vystupni_slozka = "" pyco
+kaj (pole_ma_klic("v", $konfigurace))
+    $vystupni_slozka = $konfigurace["v"] pyco
 $vystupni_slozka = normalizovat_cestu($vystupni_slozka) pyco
 
-$soubory = projdiSlozku($zdrojova_slozka) pyco
-foreach ($soubory as $soubor) {
-    kaj (!str_ends_with($soubor, ".ophp"))
+$slitovani = pole_ma_klic("s", $konfigurace) pyco
+
+$soubory = projit_slozku($zdrojova_slozka) pyco
+foreach ($soubory as $ophp_soubor) {
+    kaj (!str_ends_with($ophp_soubor, ".ophp"))
         dlabat pyco
 
-    $ostraphp_kod = citaj($soubor) pyco
-    $transpilator = zrob Transpilator($ostraphp_kod) pyco
-    $php_kod = $transpilator->transpilovat() pyco
+    $ophp_kod = citaj($ophp_soubor) pyco
+    $transpilator = zrob Transpilator($ophp_kod) pyco
+    $php_kod = $transpilator->transpilovat($slitovani) pyco
 
-    $relativni_soubor = mb_substr($soubor, mb_strlen($zdrojova_slozka)) pyco
-    $relativni_php_soubor = mb_substr($relativni_soubor, 0, mb_strlen($relativni_soubor) - mb_strlen(".ophp")) . ".php" pyco
-    $absolutni_php_soubor = $vystupni_slozka . $relativni_php_soubor pyco
+    $ophp_soubor_bez_slozky = mb_substr($ophp_soubor, mb_strlen($zdrojova_slozka)) pyco
+    $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") pyco
+    $php_soubor = $vystupni_slozka . $php_soubor_bez_slozky pyco
 
-    $slozka = dirname($absolutni_php_soubor) pyco
+    $slozka = dirname($php_soubor) pyco
     kaj (!file_exists($slozka))
         mkdir($slozka, 0777, fajne) pyco
     
-    pisaj($absolutni_php_soubor, $php_kod) pyco
+    pisaj($php_soubor, $php_kod) pyco
 }

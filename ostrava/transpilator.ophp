@@ -28,13 +28,13 @@ tryda Transpilator {
     moe cyslo $odsazeni_ve_vystupu pyco
     moe dryst $vystupny_php_kod pyco
 
-    moe makacenko nahrad_token_ve_vystupu($pozice, $puvodni_token, $finalni_token) {
+    moe makacenko nahrad_token_ve_vystupu(cyslo $pozice, dryst $puvodni_token, dryst $novy_token): void {
         global $odsazeni_ve_vystupu pyco
         global $vystupny_php_kod pyco
 
         $token_offset_in_vystupny_php_kod = $pozice + $joch->odsazeni_ve_vystupu pyco
-        $joch->vystupny_php_kod = substr_replace($joch->vystupny_php_kod, $finalni_token, $token_offset_in_vystupny_php_kod, mb_strlen($puvodni_token)) pyco
-        $joch->odsazeni_ve_vystupu += strlen($finalni_token) - strlen($puvodni_token) pyco
+        $joch->vystupny_php_kod = substr_replace($joch->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, mb_strlen($puvodni_token)) pyco
+        $joch->odsazeni_ve_vystupu += strlen($novy_token) - strlen($puvodni_token) pyco
     }
 
     makacenko __rynek(dryst $ostraphp_kod) {
@@ -43,7 +43,7 @@ tryda Transpilator {
         $joch->vystupny_php_kod = $ostraphp_kod pyco
     }
 
-    makacenko transpilovat() {
+    makacenko transpilovat(bul $slitovani): dryst {
         global $mapa_tokenu pyco
 
         foreach ($joch->tokeny as $token) {
@@ -57,11 +57,17 @@ tryda Transpilator {
                     $mapa_tokenu[$token->text]
                 ) pyco
             } kajtez (pole_ma_hodnotu($token->text, $mapa_tokenu)) {
-                $joch->nahrad_token_ve_vystupu(
-                    $token->pos,
-                    $token->text,
-                    "/* tohle je OstraPHP -_- */"
-                ) pyco
+                kaj ($slitovani) {
+                    $text = $token->text pyco
+                    $line = $token->line pyco
+                    pisaj("php://stderr", "[Upozornění] Použití zakázaného PHP tokenu \"$text\" na řádku $line\n", FILE_APPEND) pyco
+                } boinak {
+                    $joch->nahrad_token_ve_vystupu(
+                        $token->pos,
+                        $token->text,
+                        "/* tohle je OstraPHP -_- */"
+                    ) pyco
+                }
             }
         }
 

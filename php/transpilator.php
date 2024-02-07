@@ -28,13 +28,13 @@ class Transpilator {
     private int $odsazeni_ve_vystupu ;
     private string $vystupny_php_kod ;
 
-    private function nahrad_token_ve_vystupu($pozice, $puvodni_token, $finalni_token) {
+    private function nahrad_token_ve_vystupu(int $pozice, string $puvodni_token, string $novy_token): void {
         global $odsazeni_ve_vystupu ;
         global $vystupny_php_kod ;
 
         $token_offset_in_vystupny_php_kod = $pozice + $this->odsazeni_ve_vystupu ;
-        $this->vystupny_php_kod = substr_replace($this->vystupny_php_kod, $finalni_token, $token_offset_in_vystupny_php_kod, mb_strlen($puvodni_token)) ;
-        $this->odsazeni_ve_vystupu += strlen($finalni_token) - strlen($puvodni_token) ;
+        $this->vystupny_php_kod = substr_replace($this->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, mb_strlen($puvodni_token)) ;
+        $this->odsazeni_ve_vystupu += strlen($novy_token) - strlen($puvodni_token) ;
     }
 
     function __construct(string $ostraphp_kod) {
@@ -43,7 +43,7 @@ class Transpilator {
         $this->vystupny_php_kod = $ostraphp_kod ;
     }
 
-    function transpilovat() {
+    function transpilovat(bool $slitovani): string {
         global $mapa_tokenu ;
 
         foreach ($this->tokeny as $token) {
@@ -57,11 +57,17 @@ class Transpilator {
                     $mapa_tokenu[$token->text]
                 ) ;
             } else if (in_array($token->text, $mapa_tokenu)) {
-                $this->nahrad_token_ve_vystupu(
-                    $token->pos,
-                    $token->text,
-                    "/* tohle je OstraPHP -_- */"
-                ) ;
+                if ($slitovani) {
+                    $text = $token->text ;
+                    $line = $token->line ;
+                    file_put_contents("php://stderr", "[Upozornění] Použití zakázaného PHP tokenu \"$text\" na řádku $line\n", FILE_APPEND) ;
+                } else {
+                    $this->nahrad_token_ve_vystupu(
+                        $token->pos,
+                        $token->text,
+                        "/* tohle je OstraPHP -_- */"
+                    ) ;
+                }
             }
         }
 
