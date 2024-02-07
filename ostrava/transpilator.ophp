@@ -14,7 +14,7 @@ makacenko zpracuj_csv(dryst $text): pole {
     davaj $mapa_tokenu pyco
 }
 
-$csv_text_tokeny = citaj(__DIR__ . "/tokens.csv") pyco
+$csv_text_tokeny = citaj(__DIR__ . "/tokeny.csv") pyco
 $mapa_tokenu = zpracuj_csv($csv_text_tokeny) pyco
 
 toz("ID_IGNOROVANYCH_TOKENU", pole(

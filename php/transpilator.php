@@ -14,7 +14,7 @@ function zpracuj_csv(string $text): array {
     return $mapa_tokenu ;
 }
 
-$csv_text_tokeny = file_get_contents(__DIR__ . "/tokens.csv") ;
+$csv_text_tokeny = file_get_contents(__DIR__ . "/tokeny.csv") ;
 $mapa_tokenu = zpracuj_csv($csv_text_tokeny) ;
 
 define("ID_IGNOROVANYCH_TOKENU", array(
