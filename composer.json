@@ -1,5 +1,6 @@
 {
     "name": "vfosnar/ostraphp",
+    "description": "Bo neni cas pyco",
     "type": "project",
     "license": "AGPL-3.0-only",
     "bin": [
@@ -11,5 +12,7 @@
             "email": "me@vfosnar.cz"
         }
     ],
-    "require": {}
+    "require": {
+        "php": ">=8.2"
+    }
 }
