@@ -1,0 +1,15 @@
+{
+    "name": "vfosnar/ostraphp",
+    "type": "project",
+    "license": "AGPL-3.0-only",
+    "bin": [
+        "php/ophp"
+    ],
+    "authors": [
+        {
+            "name": "Vojtěch Fošnár",
+            "email": "me@vfosnar.cz"
+        }
+    ],
+    "require": {}
+}

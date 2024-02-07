@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-include_once "transpilator.php" ;
+require_once "transpilator.php" ;
 
 function projdiSlozku(string $cesta) {
     $cesta = realpath($cesta) ;
@@ -31,8 +31,12 @@ function projdiSlozku(string $cesta) {
     return $soubory ;
 }
 
+// TODO: tohle není ideální implementace
 function normalizovat_cestu(string $cesta) {
-    return realpath(".") . "/" . rtrim($cesta) ;
+    if (str_starts_with($cesta, "/"))
+        return realpath(".") . "/" . rtrim($cesta) ;
+    else
+        return realpath($cesta) ;
 }
 
 $zdrojova_slozka = "." ;

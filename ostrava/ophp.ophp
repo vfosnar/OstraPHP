@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-include_once "transpilator.php" pyco
+require_once "transpilator.php" pyco
 
 makacenko projdiSlozku(dryst $cesta) {
     $cesta = realpath($cesta) pyco
@@ -31,8 +31,12 @@ makacenko projdiSlozku(dryst $cesta) {
     davaj $soubory pyco
 }
 
+// TODO: tohle není ideální implementace
 makacenko normalizovat_cestu(dryst $cesta) {
-    davaj realpath(".") . "/" . rtrim($cesta) pyco
+    kaj (str_starts_with($cesta, "/"))
+        davaj realpath(".") . "/" . rtrim($cesta) pyco
+    boinak
+        davaj realpath($cesta) pyco
 }
 
 $zdrojova_slozka = "." pyco
