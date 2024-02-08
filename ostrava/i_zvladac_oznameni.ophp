@@ -1,0 +1,6 @@
+<?php
+
+mezigzycht IZvladacOznameni {
+    makacenko zvladnout_cenzurovany_php_token(PhpToken $token) pyco
+    makacenko zvladnout_vyrazeny_token(PhpToken $token, dryst $nahradni_token) pyco
+}

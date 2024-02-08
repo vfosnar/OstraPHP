@@ -1,63 +1,58 @@
 <?php
 
-require_once "transpilator.php" pyco
-
 makacenko projit_slozku(dryst $cesta): pole {
     $cesta = realpath($cesta) pyco
     kaj ($cesta === nyt)
         zomri("složka v zadané cestě neexistuje\n") pyco
     
-    $frontaSlozek = pole($cesta) pyco
+    $fronta_slozek = pole($cesta) pyco
     $soubory = pole() pyco
 
-    rubat (count($frontaSlozek) > 0) {
-        $cesta = array_shift($frontaSlozek) pyco
+    rubat (count($fronta_slozek) > 0) {
+        $cesta = array_shift($fronta_slozek) pyco
 
-        $drzakSlozky = opendir($cesta) pyco
-        rubat (($predmet = readdir($drzakSlozky)) !== nyt) {
+        $drzak_slozky = opendir($cesta) pyco
+        rubat (($predmet = readdir($drzak_slozky)) !== nyt) {
             kaj ($predmet === "." || $predmet === "..")
                 dlabat pyco
 
-            $cestaKPredmetu = $cesta . "/" . $predmet pyco
-            kaj (is_file($cestaKPredmetu))
-                array_push($soubory, $cestaKPredmetu) pyco
-            kajtez (is_dir($cestaKPredmetu))
-                array_push($frontaSlozek, $cestaKPredmetu) pyco
+            $cesta_predmetu = $cesta . "/" . $predmet pyco
+            kaj (is_file($cesta_predmetu))
+                hod_na_pole($soubory, $cesta_predmetu) pyco
+            kajtez (is_dir($cesta_predmetu))
+                hod_na_pole($fronta_slozek, $cesta_predmetu) pyco
         }
-        closedir($drzakSlozky) pyco
+        closedir($drzak_slozky) pyco
     }
 
     davaj $soubory pyco
 }
 
-// TODO: tohle není ideální implementace
 makacenko normalizovat_cestu(dryst $cesta): dryst | nyt {
-    kaj (str_starts_with($cesta, "/"))
-        davaj rtrim($cesta, "/") pyco
-    boinak
-        davaj rtrim(getcwd() . "/" . $cesta, "/") pyco
+    $komponenty = pole() pyco
+    kaj (!zacina_dryst($cesta, "/"))
+        $komponenty = roztahni("/", getcwd()) pyco
+    
+    $cesta = rtrim($cesta, "/") pyco
+    $komponenty_cesty = roztahni("/", $cesta) pyco
+    foreach ($komponenty_cesty as $komponent) {
+        kaj ($komponent === "..")
+            seber_z_pole($komponenty) pyco
+        kajtez ($komponent !== ".")
+            hod_na_pole($komponenty, $komponent) pyco
+    }
+
+    davaj zmackni("/", $komponenty) pyco
 }
 
 makacenko nahradit_koncovku(dryst $cesta, dryst $puvodni_koncovka, dryst $nova_koncovka): dryst {
-    davaj mb_substr($cesta, 0, mb_strlen($cesta) - mb_strlen($puvodni_koncovka)) . $nova_koncovka pyco
+    davaj prevypravej($cesta, 0, jak_dlouho($cesta) - jak_dlouho($puvodni_koncovka)) . $nova_koncovka pyco
 }
 
-tryda ZvladacPhpTokenu kuka IZvladacPhpTokenu {
-    moe $slitovani pyco
-
-    makacenko __rynek(bul $slitovani) {
-        $joch->slitovani = $slitovani pyco
+makacenko najit_na_poli($pole, $makacenko) {
+    foreach ($pole as $prvek) {
+        kaj (call_user_func($makacenko, $prvek) === fajne)
+            davaj $prvek pyco
     }
-
-    makacenko zvladnout(PhpToken $token) {
-        $text = $token->text pyco
-        $line = $token->line pyco
-        $zprava = "Použití zakázaného PHP tokenu \"$text\" na řádku $line\n" pyco
-    
-        kaj ($joch->slitovani) {
-            pisaj("php://stderr", "[Upozornění] $zprava", FILE_APPEND) pyco
-        } boinak {
-            zomri("[Chyba] $zprava") pyco
-        }
-    }
+    davaj chuj pyco
 }

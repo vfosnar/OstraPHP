@@ -1,5 +1,19 @@
 <?php
 
+require_once "nastroje.php" ;
+
+class MapovanyToken {
+    public string $ostraphp_token ;
+    public string $php_token ;
+    public string | null $nahradni_token ; // pouze pokud je token vyřazený
+
+    function __construct(string $ostraphp_token, string $php_token, string | null $nahradni_token) {
+        $this->ostraphp_token = $ostraphp_token ;
+        $this->php_token = $php_token ;
+        $this->nahradni_token = $nahradni_token ;
+    }
+}
+
 function zpracuj_csv(string $text): array {
     $mapa_tokenu = array() ;
 
@@ -8,7 +22,13 @@ function zpracuj_csv(string $text): array {
             continue ;
 
         $komponenty = explode(",", $line) ;
-        $mapa_tokenu[trim($komponenty[0])] = trim($komponenty[1]) ;
+        $php_token = trim($komponenty[0]) ;
+        $ostraphp_token = trim($komponenty[1]) ;
+        $nahradni_token = null ;
+        if (count($komponenty) > 2)
+            $nahradni_token = trim($komponenty[2]) ;
+
+        $mapa_tokenu[$php_token] = new MapovanyToken($php_token, $ostraphp_token, $nahradni_token) ;
     }
 
     return $mapa_tokenu ;
@@ -22,10 +42,6 @@ define("ID_IGNOROVANYCH_TOKENU", array(
     T_END_HEREDOC,
     T_INLINE_HTML,
 )) ;
-
-interface IZvladacPhpTokenu {
-    function zvladnout(PhpToken $token) ;
-}
 
 class Transpilator {
     private array $tokeny ;
@@ -47,7 +63,7 @@ class Transpilator {
         $this->vystupny_php_kod = $ostraphp_kod ;
     }
 
-    function transpilovat(IZvladacPhpTokenu $zvladac_php_tokenu): string {
+    function transpilovat(IZvladacOznameni $zvladac_php_tokenu): string {
         global $mapa_tokenu ;
 
         foreach ($this->tokeny as $token) {
@@ -55,13 +71,18 @@ class Transpilator {
                 continue ;
 
             if (array_key_exists($token->text, $mapa_tokenu)) {
+                $mapovany_token = $mapa_tokenu[$token->text] ;
+
+                if ($mapovany_token->nahradni_token !== null)
+                    $zvladac_php_tokenu->zvladnout_vyrazeny_token($token, $mapovany_token->nahradni_token) ;
+
                 $this->nahrad_token_ve_vystupu(
                     $token->pos,
                     $token->text,
-                    $mapa_tokenu[$token->text]
+                    $mapovany_token->php_token
                 ) ;
-            } else if (in_array($token->text, $mapa_tokenu)) {
-                $zvladac_php_tokenu->zvladnout($token) ;
+            } else if (najit_na_poli($mapa_tokenu, function($prvek) use ($token) { return $prvek->php_token === $token->text ; })) {
+                $zvladac_php_tokenu->zvladnout_cenzurovany_php_token($token) ;
             }
         }
 

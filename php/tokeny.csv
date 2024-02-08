@@ -1,30 +1,43 @@
 
-davaj,  return
-cotoe,  var_dump
-povedz, echo
 pyco,   ;
 toz,    define
 zomri,  die
+chuj,   null
+davaj,  return
+
+// dryst
+povedz,         echo
+jak_dlouho,     mb_strlen
+prevypravej,    mb_substr
+dryst,          string
+cotoe,          var_dump
+zacina_dryst,   str_starts_with
+konci_dryst,    str_ends_with
 
 // pole
 pole,               array
-pole_ma_klic,       array_key_exists
-pole_ma_hodnotu,    in_array
+je_klic_na_poli,    array_key_exists
+pole_ma_klic,       array_key_exists, je_klic_na_poli
+hod_na_pole,        array_push
+seber_z_pole,       array_pop
+je_vec_na_poli,     in_array
+pole_ma_hodnotu,    in_array, je_vec_na_poli
+
+roztahni,   explode
+zmackni,    implode
 
 // vstup/výstup
 citaj, file_get_contents
 pisaj, file_put_contents
 
-// datové typy
-bul,                bool
-cyslo,              int
+// čísla
 cyslo_desetinne,    float
-dryst,              string
+cyslo,              int
 
-// jazykové konstanty
-fajne,              true
-nyt,                false
-chuj,               null
+// bul
+bul,    bool
+nyt,    false
+fajne,  true
 
 // kontrolní struktury
 kaj,        if
@@ -34,9 +47,12 @@ boinak,     else
 rubat,      while
 zdybat,     break
 dlabat,     continue
+vycet,      enum
+pripad,     case
 
 // klíčová slova spojená s OOP
 moe,        private
+nase,       public
 tryda,      class
 mezigzycht, interface
 makacenko,  function
@@ -46,3 +62,4 @@ __rynek,    __construct
 $joch,      $this
 forant,     parent
 zrob,       new
+statni,     global

@@ -1,63 +1,58 @@
 <?php
 
-require_once "transpilator.php" ;
-
 function projit_slozku(string $cesta): array {
     $cesta = realpath($cesta) ;
     if ($cesta === false)
         die("složka v zadané cestě neexistuje\n") ;
     
-    $frontaSlozek = array($cesta) ;
+    $fronta_slozek = array($cesta) ;
     $soubory = array() ;
 
-    while (count($frontaSlozek) > 0) {
-        $cesta = array_shift($frontaSlozek) ;
+    while (count($fronta_slozek) > 0) {
+        $cesta = array_shift($fronta_slozek) ;
 
-        $drzakSlozky = opendir($cesta) ;
-        while (($predmet = readdir($drzakSlozky)) !== false) {
+        $drzak_slozky = opendir($cesta) ;
+        while (($predmet = readdir($drzak_slozky)) !== false) {
             if ($predmet === "." || $predmet === "..")
                 continue ;
 
-            $cestaKPredmetu = $cesta . "/" . $predmet ;
-            if (is_file($cestaKPredmetu))
-                array_push($soubory, $cestaKPredmetu) ;
-            else if (is_dir($cestaKPredmetu))
-                array_push($frontaSlozek, $cestaKPredmetu) ;
+            $cesta_predmetu = $cesta . "/" . $predmet ;
+            if (is_file($cesta_predmetu))
+                array_push($soubory, $cesta_predmetu) ;
+            else if (is_dir($cesta_predmetu))
+                array_push($fronta_slozek, $cesta_predmetu) ;
         }
-        closedir($drzakSlozky) ;
+        closedir($drzak_slozky) ;
     }
 
     return $soubory ;
 }
 
-// TODO: tohle není ideální implementace
 function normalizovat_cestu(string $cesta): string | false {
-    if (str_starts_with($cesta, "/"))
-        return rtrim($cesta, "/") ;
-    else
-        return rtrim(getcwd() . "/" . $cesta, "/") ;
+    $komponenty = array() ;
+    if (!str_starts_with($cesta, "/"))
+        $komponenty = explode("/", getcwd()) ;
+    
+    $cesta = rtrim($cesta, "/") ;
+    $komponenty_cesty = explode("/", $cesta) ;
+    foreach ($komponenty_cesty as $komponent) {
+        if ($komponent === "..")
+            array_pop($komponenty) ;
+        else if ($komponent !== ".")
+            array_push($komponenty, $komponent) ;
+    }
+
+    return implode("/", $komponenty) ;
 }
 
 function nahradit_koncovku(string $cesta, string $puvodni_koncovka, string $nova_koncovka): string {
     return mb_substr($cesta, 0, mb_strlen($cesta) - mb_strlen($puvodni_koncovka)) . $nova_koncovka ;
 }
 
-class ZvladacPhpTokenu implements IZvladacPhpTokenu {
-    private $slitovani ;
-
-    function __construct(bool $slitovani) {
-        $this->slitovani = $slitovani ;
+function najit_na_poli($pole, $makacenko) {
+    foreach ($pole as $prvek) {
+        if (call_user_func($makacenko, $prvek) === true)
+            return $prvek ;
     }
-
-    function zvladnout(PhpToken $token) {
-        $text = $token->text ;
-        $line = $token->line ;
-        $zprava = "Použití zakázaného PHP tokenu \"$text\" na řádku $line\n" ;
-    
-        if ($this->slitovani) {
-            file_put_contents("php://stderr", "[Upozornění] $zprava", FILE_APPEND) ;
-        } else {
-            die("[Chyba] $zprava") ;
-        }
-    }
+    return null ;
 }

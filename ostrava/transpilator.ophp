@@ -1,14 +1,34 @@
 <?php
 
+require_once "nastroje.php" pyco
+
+tryda MapovanyToken {
+    nase dryst $ostraphp_token pyco
+    nase dryst $php_token pyco
+    nase dryst | chuj $nahradni_token pyco // pouze pokud je token vyřazený
+
+    makacenko __rynek(dryst $ostraphp_token, dryst $php_token, dryst | chuj $nahradni_token) {
+        $joch->ostraphp_token = $ostraphp_token pyco
+        $joch->php_token = $php_token pyco
+        $joch->nahradni_token = $nahradni_token pyco
+    }
+}
+
 makacenko zpracuj_csv(dryst $text): pole {
     $mapa_tokenu = pole() pyco
 
-    foreach (explode("\n", $text) as $line) {
-        kaj (str_starts_with($line, "//") || strlen($line) === 0)
+    foreach (roztahni("\n", $text) as $line) {
+        kaj (zacina_dryst($line, "//") || strlen($line) === 0)
             dlabat pyco
 
-        $komponenty = explode(",", $line) pyco
-        $mapa_tokenu[trim($komponenty[0])] = trim($komponenty[1]) pyco
+        $komponenty = roztahni(",", $line) pyco
+        $php_token = trim($komponenty[0]) pyco
+        $ostraphp_token = trim($komponenty[1]) pyco
+        $nahradni_token = chuj pyco
+        kaj (count($komponenty) > 2)
+            $nahradni_token = trim($komponenty[2]) pyco
+
+        $mapa_tokenu[$php_token] = zrob MapovanyToken($php_token, $ostraphp_token, $nahradni_token) pyco
     }
 
     davaj $mapa_tokenu pyco
@@ -23,21 +43,17 @@ toz("ID_IGNOROVANYCH_TOKENU", pole(
     T_INLINE_HTML,
 )) pyco
 
-mezigzycht IZvladacPhpTokenu {
-    makacenko zvladnout(PhpToken $token) pyco
-}
-
 tryda Transpilator {
     moe pole $tokeny pyco
     moe cyslo $odsazeni_ve_vystupu pyco
     moe dryst $vystupny_php_kod pyco
 
     moe makacenko nahrad_token_ve_vystupu(cyslo $pozice, dryst $puvodni_token, dryst $novy_token): void {
-        global $odsazeni_ve_vystupu pyco
-        global $vystupny_php_kod pyco
+        statni $odsazeni_ve_vystupu pyco
+        statni $vystupny_php_kod pyco
 
         $token_offset_in_vystupny_php_kod = $pozice + $joch->odsazeni_ve_vystupu pyco
-        $joch->vystupny_php_kod = substr_replace($joch->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, mb_strlen($puvodni_token)) pyco
+        $joch->vystupny_php_kod = substr_replace($joch->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, jak_dlouho($puvodni_token)) pyco
         $joch->odsazeni_ve_vystupu += strlen($novy_token) - strlen($puvodni_token) pyco
     }
 
@@ -47,21 +63,26 @@ tryda Transpilator {
         $joch->vystupny_php_kod = $ostraphp_kod pyco
     }
 
-    makacenko transpilovat(IZvladacPhpTokenu $zvladac_php_tokenu): dryst {
-        global $mapa_tokenu pyco
+    makacenko transpilovat(IZvladacOznameni $zvladac_php_tokenu): dryst {
+        statni $mapa_tokenu pyco
 
         foreach ($joch->tokeny as $token) {
-            kaj (pole_ma_hodnotu($token->id, ID_IGNOROVANYCH_TOKENU))
+            kaj (je_vec_na_poli($token->id, ID_IGNOROVANYCH_TOKENU))
                 dlabat pyco
 
-            kaj (pole_ma_klic($token->text, $mapa_tokenu)) {
+            kaj (je_klic_na_poli($token->text, $mapa_tokenu)) {
+                $mapovany_token = $mapa_tokenu[$token->text] pyco
+
+                kaj ($mapovany_token->nahradni_token !== chuj)
+                    $zvladac_php_tokenu->zvladnout_vyrazeny_token($token, $mapovany_token->nahradni_token) pyco
+
                 $joch->nahrad_token_ve_vystupu(
                     $token->pos,
                     $token->text,
-                    $mapa_tokenu[$token->text]
+                    $mapovany_token->php_token
                 ) pyco
-            } kajtez (pole_ma_hodnotu($token->text, $mapa_tokenu)) {
-                $zvladac_php_tokenu->zvladnout($token) pyco
+            } kajtez (najit_na_poli($mapa_tokenu, makacenko($prvek) use ($token) { davaj $prvek->php_token === $token->text pyco })) {
+                $zvladac_php_tokenu->zvladnout_cenzurovany_php_token($token) pyco
             }
         }
 

@@ -3,6 +3,7 @@
 
 require_once "nastroje.php" ;
 require_once "transpilator.php" ;
+require_once "zvladac_oznameni.php" ;
 
 $kratke_moznosti = "" ;
 $kratke_moznosti .= "z::" ;
@@ -32,30 +33,38 @@ EOT ;
     return ;
 }
 
+echo "spouštění transpilátoru\n" ;
+
 $zdrojova_slozka = "" ;
 if (array_key_exists("z", $konfigurace))
     $zdrojova_slozka = $konfigurace["z"] ;
 $zdrojova_slozka = normalizovat_cestu($zdrojova_slozka) ;
+echo "zdrojová složka: $zdrojova_slozka\n" ;
 
 $vystupni_slozka = "" ;
 if (array_key_exists("v", $konfigurace))
     $vystupni_slozka = $konfigurace["v"] ;
 $vystupni_slozka = normalizovat_cestu($vystupni_slozka) ;
+echo "výstupní složka: $vystupni_slozka\n" ;
 
 $slitovani = array_key_exists("s", $konfigurace) ;
+$slitovani_text = $slitovani ? "fajne" : "nyt" ;
+echo "mód slitování: $slitovani_text\n" ;
+
+echo "\n" ;
 
 $soubory = projit_slozku($zdrojova_slozka) ;
-foreach ($soubory as $ophp_soubor) {
-    if (!str_ends_with($ophp_soubor, ".ophp"))
-        continue ;
-
-    $ophp_kod = file_get_contents($ophp_soubor) ;
-    $transpilator = new Transpilator($ophp_kod) ;
-    $php_kod = $transpilator->transpilovat(new ZvladacPhpTokenu($slitovani)) ;
-
+$ophp_soubory = array_filter($soubory, function($ophp_soubor) { return str_ends_with($ophp_soubor, ".ophp") ; }) ;
+foreach ($ophp_soubory as $ophp_soubor) {
     $ophp_soubor_bez_slozky = mb_substr($ophp_soubor, mb_strlen($zdrojova_slozka)) ;
     $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") ;
     $php_soubor = $vystupni_slozka . $php_soubor_bez_slozky ;
+    
+    $prefix = "[$ophp_soubor_bez_slozky] " ;
+
+    $ophp_kod = file_get_contents($ophp_soubor) ;
+    $transpilator = new Transpilator($ophp_kod) ;
+    $php_kod = $transpilator->transpilovat(new ZvladacOznameni($slitovani, $prefix)) ;
 
     $slozka = dirname($php_soubor) ;
     if (!file_exists($slozka))
@@ -63,3 +72,6 @@ foreach ($soubory as $ophp_soubor) {
     
     file_put_contents($php_soubor, $php_kod) ;
 }
+
+echo "\n" ;
+echo "dokončeno\n" ;
