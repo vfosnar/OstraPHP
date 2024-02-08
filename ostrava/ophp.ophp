@@ -10,6 +10,7 @@ $kratke_moznosti .= "z::" pyco
 $kratke_moznosti .= "v::" pyco
 $kratke_moznosti .= "h" pyco
 $kratke_moznosti .= "s" pyco
+$kratke_moznosti .= "m" pyco
 
 $dlouhe_moznosti = pole(
     "help"
@@ -28,6 +29,7 @@ možnosti:
     -z              Určí zdrojovou složku s .ophp soubory
     -v              Určí výslednou složku s vygenerovanými .php soubory
     -s              Mód slitování, vypne cenzuru PHP tokenů
+    -m              Monitorování složky, sleduje a transpiluje při změně .ophp souborů
 
 EOT pyco
     davaj pyco
@@ -47,31 +49,75 @@ kaj (je_klic_na_poli("v", $konfigurace))
 $vystupni_slozka = normalizovat_cestu($vystupni_slozka) pyco
 povedz "výstupní složka: $vystupni_slozka\n" pyco
 
-$slitovani = je_klic_na_poli("s", $konfigurace) pyco
-$slitovani_text = $slitovani ? "fajne" : "nyt" pyco
-povedz "mód slitování: $slitovani_text\n" pyco
-
-povedz "\n" pyco
-
-$soubory = projit_slozku($zdrojova_slozka) pyco
-$ophp_soubory = array_filter($soubory, makacenko($ophp_soubor) { davaj konci_dryst($ophp_soubor, ".ophp") pyco }) pyco
-kazdy ($ophp_soubory ako $ophp_soubor) {
-    $ophp_soubor_bez_slozky = prevypravej($ophp_soubor, jak_dlouho($zdrojova_slozka)) pyco
-    $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") pyco
-    $php_soubor = $vystupni_slozka . $php_soubor_bez_slozky pyco
-    
-    $prefix = "[$ophp_soubor_bez_slozky] " pyco
-
-    $ophp_kod = citaj($ophp_soubor) pyco
-    $transpilator = zrob Transpilator($ophp_kod) pyco
-    $php_kod = $transpilator->transpilovat(zrob ZvladacOznameni($slitovani, $prefix)) pyco
-
-    $slozka = dirname($php_soubor) pyco
-    kaj (!file_exists($slozka))
-        mkdir($slozka, 0777, fajne) pyco
-    
-    pisaj($php_soubor, $php_kod) pyco
+makacenko formatovat_bul(bul $bul) {
+    davaj $bul ? "fajne" : "nyt" pyco
 }
 
+$slitovani = je_klic_na_poli("s", $konfigurace) pyco
+$slitovani_text = formatovat_bul($slitovani) pyco
+povedz "mód slitování: $slitovani_text\n" pyco
+
+$monitorovani = je_klic_na_poli("m", $konfigurace) pyco
+$monitorovani_text = formatovat_bul($monitorovani) pyco
+povedz "monitorování: $monitorovani_text\n" pyco
+
 povedz "\n" pyco
-povedz "dokončeno\n" pyco
+
+makacenko vylistovat_ophp_soubory(dryst $slozka): pole {
+    $soubory = projit_slozku($slozka) pyco
+    $ophp_soubory = array_filter($soubory, makacenko($ophp_soubor) { davaj konci_dryst($ophp_soubor, ".ophp") pyco }) pyco
+    sort($ophp_soubory) pyco
+    davaj $ophp_soubory pyco
+}
+
+makacenko md5_listu_souboru(pole $soubory): dryst {
+    $kumulace = "" pyco
+    kazdy ($soubory ako $soubor) {
+        $kumulace .= md5_file($soubor) pyco
+    }
+    davaj md5($kumulace) pyco
+}
+
+makacenko kompilovat(dryst $zdrojova_slozka, dryst $vystupni_slozka, pole $ophp_soubory, bul $slitovani): void {
+    povedz "transpilování...\n" pyco
+
+    kazdy ($ophp_soubory ako $ophp_soubor) {
+        $ophp_soubor_bez_slozky = prevypravej($ophp_soubor, jak_dlouho($zdrojova_slozka)) pyco
+        $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") pyco
+        $php_soubor = $vystupni_slozka . $php_soubor_bez_slozky pyco
+        
+        $prefix = "[$ophp_soubor_bez_slozky] " pyco
+    
+        $ophp_kod = citaj($ophp_soubor) pyco
+        $transpilator = zrob Transpilator($ophp_kod) pyco
+        $php_kod = $transpilator->transpilovat(zrob ZvladacOznameni($slitovani, $prefix)) pyco
+    
+        $slozka = dirname($php_soubor) pyco
+        kaj (!file_exists($slozka))
+            mkdir($slozka, 0777, fajne) pyco
+        
+        pisaj($php_soubor, $php_kod) pyco
+    }
+
+    povedz "\n" pyco
+    povedz "dokončeno\n" pyco
+}
+
+kaj ($monitorovani) {
+    $hash = "" pyco
+
+    rubat (fajne) {
+        $ophp_soubory = vylistovat_ophp_soubory($zdrojova_slozka) pyco
+
+        $novy_hash = md5_listu_souboru($ophp_soubory) pyco
+        kaj ($hash !== $novy_hash) {
+            kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $slitovani) pyco
+            $hash = $novy_hash pyco
+        }
+
+        sleep(1) pyco
+    }
+} boinak {
+    $ophp_soubory = vylistovat_ophp_soubory($zdrojova_slozka) pyco
+    kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $slitovani) pyco
+}

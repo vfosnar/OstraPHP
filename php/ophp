@@ -10,6 +10,7 @@ $kratke_moznosti .= "z::" ;
 $kratke_moznosti .= "v::" ;
 $kratke_moznosti .= "h" ;
 $kratke_moznosti .= "s" ;
+$kratke_moznosti .= "m" ;
 
 $dlouhe_moznosti = array(
     "help"
@@ -28,6 +29,7 @@ možnosti:
     -z              Určí zdrojovou složku s .ophp soubory
     -v              Určí výslednou složku s vygenerovanými .php soubory
     -s              Mód slitování, vypne cenzuru PHP tokenů
+    -m              Monitorování složky, sleduje a transpiluje při změně .ophp souborů
 
 EOT ;
     return ;
@@ -47,31 +49,75 @@ if (array_key_exists("v", $konfigurace))
 $vystupni_slozka = normalizovat_cestu($vystupni_slozka) ;
 echo "výstupní složka: $vystupni_slozka\n" ;
 
-$slitovani = array_key_exists("s", $konfigurace) ;
-$slitovani_text = $slitovani ? "fajne" : "nyt" ;
-echo "mód slitování: $slitovani_text\n" ;
-
-echo "\n" ;
-
-$soubory = projit_slozku($zdrojova_slozka) ;
-$ophp_soubory = array_filter($soubory, function($ophp_soubor) { return str_ends_with($ophp_soubor, ".ophp") ; }) ;
-foreach ($ophp_soubory as $ophp_soubor) {
-    $ophp_soubor_bez_slozky = mb_substr($ophp_soubor, mb_strlen($zdrojova_slozka)) ;
-    $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") ;
-    $php_soubor = $vystupni_slozka . $php_soubor_bez_slozky ;
-    
-    $prefix = "[$ophp_soubor_bez_slozky] " ;
-
-    $ophp_kod = file_get_contents($ophp_soubor) ;
-    $transpilator = new Transpilator($ophp_kod) ;
-    $php_kod = $transpilator->transpilovat(new ZvladacOznameni($slitovani, $prefix)) ;
-
-    $slozka = dirname($php_soubor) ;
-    if (!file_exists($slozka))
-        mkdir($slozka, 0777, true) ;
-    
-    file_put_contents($php_soubor, $php_kod) ;
+function formatovat_bul(bool $bul) {
+    return $bul ? "fajne" : "nyt" ;
 }
 
+$slitovani = array_key_exists("s", $konfigurace) ;
+$slitovani_text = formatovat_bul($slitovani) ;
+echo "mód slitování: $slitovani_text\n" ;
+
+$monitorovani = array_key_exists("m", $konfigurace) ;
+$monitorovani_text = formatovat_bul($monitorovani) ;
+echo "monitorování: $monitorovani_text\n" ;
+
 echo "\n" ;
-echo "dokončeno\n" ;
+
+function vylistovat_ophp_soubory(string $slozka): array {
+    $soubory = projit_slozku($slozka) ;
+    $ophp_soubory = array_filter($soubory, function($ophp_soubor) { return str_ends_with($ophp_soubor, ".ophp") ; }) ;
+    sort($ophp_soubory) ;
+    return $ophp_soubory ;
+}
+
+function md5_listu_souboru(array $soubory): string {
+    $kumulace = "" ;
+    foreach ($soubory as $soubor) {
+        $kumulace .= md5_file($soubor) ;
+    }
+    return md5($kumulace) ;
+}
+
+function kompilovat(string $zdrojova_slozka, string $vystupni_slozka, array $ophp_soubory, bool $slitovani): void {
+    echo "transpilování...\n" ;
+
+    foreach ($ophp_soubory as $ophp_soubor) {
+        $ophp_soubor_bez_slozky = mb_substr($ophp_soubor, mb_strlen($zdrojova_slozka)) ;
+        $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") ;
+        $php_soubor = $vystupni_slozka . $php_soubor_bez_slozky ;
+        
+        $prefix = "[$ophp_soubor_bez_slozky] " ;
+    
+        $ophp_kod = file_get_contents($ophp_soubor) ;
+        $transpilator = new Transpilator($ophp_kod) ;
+        $php_kod = $transpilator->transpilovat(new ZvladacOznameni($slitovani, $prefix)) ;
+    
+        $slozka = dirname($php_soubor) ;
+        if (!file_exists($slozka))
+            mkdir($slozka, 0777, true) ;
+        
+        file_put_contents($php_soubor, $php_kod) ;
+    }
+
+    echo "\n" ;
+    echo "dokončeno\n" ;
+}
+
+if ($monitorovani) {
+    $hash = "" ;
+
+    while (true) {
+        $ophp_soubory = vylistovat_ophp_soubory($zdrojova_slozka) ;
+
+        $novy_hash = md5_listu_souboru($ophp_soubory) ;
+        if ($hash !== $novy_hash) {
+            kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $slitovani) ;
+            $hash = $novy_hash ;
+        }
+
+        sleep(1) ;
+    }
+} else {
+    $ophp_soubory = vylistovat_ophp_soubory($zdrojova_slozka) ;
+    kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $slitovani) ;
+}
