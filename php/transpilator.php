@@ -67,7 +67,17 @@ class Transpilator {
     function transpilovat(IZvladacOznameni $zvladac_oznameni): string {
         global $mapa_tokenu ;
 
+        $nasleduje_nazev_metody = false ;
         foreach ($this->tokeny as $token) {
+            if ($token->id === T_OBJECT_OPERATOR || $token->id === T_NULLSAFE_OBJECT_OPERATOR) {
+                $nasleduje_nazev_metody = true ;
+                continue ;
+            }
+            if ($nasleduje_nazev_metody && $token->id === T_STRING) {
+                $nasleduje_nazev_metody = false ;
+                continue ;
+            }
+
             if (in_array($token->id, ID_IGNOROVANYCH_TOKENU))
                 continue ;
 

@@ -67,7 +67,17 @@ tryda Transpilator {
     makacenko transpilovat(IZvladacOznameni $zvladac_oznameni): dryst {
         gront $mapa_tokenu pyco
 
+        $nasleduje_nazev_metody = nyt pyco
         kazdy ($joch->tokeny ako $token) {
+            kaj ($token->id === T_OBJECT_OPERATOR || $token->id === T_NULLSAFE_OBJECT_OPERATOR) {
+                $nasleduje_nazev_metody = fajne pyco
+                dlabat pyco
+            }
+            kaj ($nasleduje_nazev_metody && $token->id === T_STRING) {
+                $nasleduje_nazev_metody = nyt pyco
+                dlabat pyco
+            }
+
             kaj (je_vec_na_poly($token->id, ID_IGNOROVANYCH_TOKENU))
                 dlabat pyco
 

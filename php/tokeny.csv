@@ -105,3 +105,10 @@ zrob,       new
 forant,     parent
 moe,        private
 nase,       public
+
+// try/catch
+zkus,   try
+fasuj,  catch
+
+// chybové konstanty
+CypDeliNulou,   DivisionByZeroError
