@@ -1,9 +1,9 @@
-#!/usr/bin/php
+#!/bin/php
 <?php
 
-vyzaduj_jednou "nastroje.php" pyco
-vyzaduj_jednou "transpilator.php" pyco
-vyzaduj_jednou "zvladac_oznameni.php" pyco
+chcu_jednou "nastroje.php" pyco
+chcu_jednou "transpilator.php" pyco
+chcu_jednou "zvladac_oznameni.php" pyco
 
 $kratke_moznosti = "" pyco
 $kratke_moznosti .= "z::" pyco
@@ -18,7 +18,7 @@ $dlouhe_moznosti = pole(
 
 $konfigurace = getopt($kratke_moznosti, $dlouhe_moznosti) pyco
 
-kaj (je_klic_na_poli("h", $konfigurace) || je_klic_na_poli("help", $konfigurace)) {
+kaj (je_klyc_na_poly("h", $konfigurace) || je_klyc_na_poly("help", $konfigurace)) {
     povedz <<<EOT
 použití: ophp [možnosti]
 
@@ -38,13 +38,13 @@ EOT pyco
 povedz "spouštění transpilátoru\n" pyco
 
 $zdrojova_slozka = "" pyco
-kaj (je_klic_na_poli("z", $konfigurace))
+kaj (je_klyc_na_poly("z", $konfigurace))
     $zdrojova_slozka = $konfigurace["z"] pyco
 $zdrojova_slozka = normalizovat_cestu($zdrojova_slozka) pyco
 povedz "zdrojová složka: $zdrojova_slozka\n" pyco
 
 $vystupni_slozka = "" pyco
-kaj (je_klic_na_poli("v", $konfigurace))
+kaj (je_klyc_na_poly("v", $konfigurace))
     $vystupni_slozka = $konfigurace["v"] pyco
 $vystupni_slozka = normalizovat_cestu($vystupni_slozka) pyco
 povedz "výstupní složka: $vystupni_slozka\n" pyco
@@ -53,11 +53,11 @@ makacenko formatovat_bul(bul $bul) {
     davaj $bul ? "fajne" : "nyt" pyco
 }
 
-$slitovani = je_klic_na_poli("s", $konfigurace) pyco
+$slitovani = je_klyc_na_poly("s", $konfigurace) pyco
 $slitovani_text = formatovat_bul($slitovani) pyco
 povedz "mód slitování: $slitovani_text\n" pyco
 
-$monitorovani = je_klic_na_poli("m", $konfigurace) pyco
+$monitorovani = je_klyc_na_poly("m", $konfigurace) pyco
 $monitorovani_text = formatovat_bul($monitorovani) pyco
 povedz "monitorování: $monitorovani_text\n" pyco
 
@@ -65,17 +65,9 @@ povedz "\n" pyco
 
 makacenko vylistovat_ophp_soubory(dryst $slozka): pole {
     $soubory = projit_slozku($slozka) pyco
-    $ophp_soubory = array_filter($soubory, makacenko($ophp_soubor) { davaj konci_dryst($ophp_soubor, ".ophp") pyco }) pyco
-    sort($ophp_soubory) pyco
+    $ophp_soubory = vylystovat_z_pole($soubory, makacenko($ophp_soubor) { davaj konci_dryst($ophp_soubor, ".ophp") pyco }) pyco
+    stumedluj($ophp_soubory) pyco
     davaj $ophp_soubory pyco
-}
-
-makacenko md5_listu_souboru(pole $soubory): dryst {
-    $kumulace = "" pyco
-    kazdy ($soubory ako $soubor) {
-        $kumulace .= md5_file($soubor) pyco
-    }
-    davaj md5($kumulace) pyco
 }
 
 makacenko kompilovat(dryst $zdrojova_slozka, dryst $vystupni_slozka, pole $ophp_soubory, bul $slitovani): void {
@@ -93,8 +85,8 @@ makacenko kompilovat(dryst $zdrojova_slozka, dryst $vystupni_slozka, pole $ophp_
         $php_kod = $transpilator->transpilovat(zrob ZvladacOznameni($slitovani, $prefix)) pyco
     
         $slozka = dirname($php_soubor) pyco
-        kaj (!file_exists($slozka))
-            mkdir($slozka, 0777, fajne) pyco
+        kaj (!cekni($slozka))
+            zrob_slozku($slozka, 0777, fajne) pyco
         
         pisaj($php_soubor, $php_kod) pyco
     }
@@ -109,13 +101,13 @@ kaj ($monitorovani) {
     rubat (fajne) {
         $ophp_soubory = vylistovat_ophp_soubory($zdrojova_slozka) pyco
 
-        $novy_hash = md5_listu_souboru($ophp_soubory) pyco
+        $novy_hash = md5_pole_souboru($ophp_soubory) pyco
         kaj ($hash !== $novy_hash) {
             kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $slitovani) pyco
             $hash = $novy_hash pyco
         }
 
-        sleep(1) pyco
+        bacias(1) pyco
     }
 } boinak {
     $ophp_soubory = vylistovat_ophp_soubory($zdrojova_slozka) pyco

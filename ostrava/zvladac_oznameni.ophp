@@ -1,6 +1,6 @@
 <?php
 
-vyzaduj_jednou "i_zvladac_oznameni.php" pyco
+chcu_jednou "i_zvladac_oznameni.php" pyco
 
 tryda ZvladacOznameni kuka IZvladacOznameni {
     moe $slitovani pyco
@@ -40,6 +40,6 @@ tryda ZvladacOznameni kuka IZvladacOznameni {
     }
 
     moe makacenko vypsat_chybu_a_ukoncit($zprava) {
-        zomri("$joch->prefix[Chyba] $zprava") pyco
+        chlampaj("$joch->prefix[Chyba] $zprava") pyco
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-vyzaduj_jednou "nastroje.php" pyco
+chcu_jednou "nastroje.php" pyco
 
 tryda MapovanyToken {
     nase dryst $ostraphp_token pyco
@@ -17,15 +17,15 @@ tryda MapovanyToken {
 makacenko zpracuj_csv(dryst $text): pole {
     $mapa_tokenu = pole() pyco
 
-    kazdy (roztahni("\n", $text) ako $line) {
+    kazdy (rnuj("\n", $text) ako $line) {
         kaj (zacina_dryst($line, "//") || strlen($line) === 0)
             dlabat pyco
 
-        $komponenty = roztahni(",", $line) pyco
+        $komponenty = rnuj(",", $line) pyco
         $php_token = ostrihej($komponenty[0]) pyco
         $ostraphp_token = ostrihej($komponenty[1]) pyco
         $nahradni_token = chuj pyco
-        kaj (spocitej($komponenty) > 2)
+        kaj (rachuj($komponenty) > 2)
             $nahradni_token = ostrihej($komponenty[2]) pyco
 
         $mapa_tokenu[$php_token] = zrob MapovanyToken($php_token, $ostraphp_token, $nahradni_token) pyco
@@ -49,8 +49,8 @@ tryda Transpilator {
     moe dryst $vystupny_php_kod pyco
 
     moe makacenko nahrad_token_ve_vystupu(cyslo $pozice, dryst $puvodni_token, dryst $novy_token): void {
-        statni $odsazeni_ve_vystupu pyco
-        statni $vystupny_php_kod pyco
+        gront $odsazeni_ve_vystupu pyco
+        gront $vystupny_php_kod pyco
 
         // PhpToken::tokenize čte po bytech, ne znacích
         $token_offset_in_vystupny_php_kod = $pozice + $joch->odsazeni_ve_vystupu pyco
@@ -64,18 +64,18 @@ tryda Transpilator {
         $joch->vystupny_php_kod = $ostraphp_kod pyco
     }
 
-    makacenko transpilovat(IZvladacOznameni $zvladac_php_tokenu): dryst {
-        statni $mapa_tokenu pyco
+    makacenko transpilovat(IZvladacOznameni $zvladac_oznameni): dryst {
+        gront $mapa_tokenu pyco
 
         kazdy ($joch->tokeny ako $token) {
-            kaj (je_vec_na_poli($token->id, ID_IGNOROVANYCH_TOKENU))
+            kaj (je_vec_na_poly($token->id, ID_IGNOROVANYCH_TOKENU))
                 dlabat pyco
 
-            kaj (je_klic_na_poli($token->text, $mapa_tokenu)) {
+            kaj (je_klyc_na_poly($token->text, $mapa_tokenu)) {
                 $mapovany_token = $mapa_tokenu[$token->text] pyco
 
                 kaj ($mapovany_token->nahradni_token !== chuj)
-                    $zvladac_php_tokenu->zvladnout_vyrazeny_token($token, $mapovany_token->nahradni_token) pyco
+                    $zvladac_oznameni->zvladnout_vyrazeny_token($token, $mapovany_token->nahradni_token) pyco
 
                 $joch->nahrad_token_ve_vystupu(
                     $token->pos,
@@ -83,7 +83,7 @@ tryda Transpilator {
                     $mapovany_token->php_token
                 ) pyco
             } kajtez (najit_na_poli($mapa_tokenu, makacenko($prvek) pouzij ($token) { davaj $prvek->php_token === $token->text pyco })) {
-                $zvladac_php_tokenu->zvladnout_cenzurovany_php_token($token) pyco
+                $zvladac_oznameni->zvladnout_cenzurovany_php_token($token) pyco
             }
         }
 

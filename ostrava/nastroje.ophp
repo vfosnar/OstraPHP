@@ -3,12 +3,12 @@
 makacenko projit_slozku(dryst $cesta): pole {
     $cesta = realpath($cesta) pyco
     kaj ($cesta === nyt)
-        zomri("složka v zadané cestě neexistuje\n") pyco
+        chlampaj("složka v zadané cestě neexistuje\n") pyco
     
     $fronta_slozek = pole($cesta) pyco
     $soubory = pole() pyco
 
-    rubat (spocitej($fronta_slozek) > 0) {
+    rubat (rachuj($fronta_slozek) > 0) {
         $cesta = array_shift($fronta_slozek) pyco
 
         $drzak_slozky = opendir($cesta) pyco
@@ -18,9 +18,9 @@ makacenko projit_slozku(dryst $cesta): pole {
 
             $cesta_predmetu = $cesta . "/" . $predmet pyco
             kaj (is_file($cesta_predmetu))
-                hod_na_pole($soubory, $cesta_predmetu) pyco
+                hod_do_pola($soubory, $cesta_predmetu) pyco
             kajtez (is_dir($cesta_predmetu))
-                hod_na_pole($fronta_slozek, $cesta_predmetu) pyco
+                hod_do_pola($fronta_slozek, $cesta_predmetu) pyco
         }
         closedir($drzak_slozky) pyco
     }
@@ -31,15 +31,15 @@ makacenko projit_slozku(dryst $cesta): pole {
 makacenko normalizovat_cestu(dryst $cesta): dryst | nyt {
     $komponenty = pole() pyco
     kaj (!zacina_dryst($cesta, "/"))
-        $komponenty = roztahni("/", getcwd()) pyco
+        $komponenty = rnuj("/", getcwd()) pyco
     
     $cesta = rtrim($cesta, "/") pyco
-    $komponenty_cesty = roztahni("/", $cesta) pyco
+    $komponenty_cesty = rnuj("/", $cesta) pyco
     kazdy ($komponenty_cesty ako $komponent) {
         kaj ($komponent === "..")
             seber_z_pole($komponenty) pyco
         kajtez ($komponent !== ".")
-            hod_na_pole($komponenty, $komponent) pyco
+            hod_do_pola($komponenty, $komponent) pyco
     }
 
     davaj zmackni("/", $komponenty) pyco
@@ -55,4 +55,12 @@ makacenko najit_na_poli($pole, $makacenko) {
             davaj $prvek pyco
     }
     davaj chuj pyco
+}
+
+makacenko md5_pole_souboru(pole $soubory): dryst {
+    $kumulace = "" pyco
+    kazdy ($soubory ako $soubor) {
+        $kumulace .= md5_file($soubor) pyco
+    }
+    davaj md5($kumulace) pyco
 }

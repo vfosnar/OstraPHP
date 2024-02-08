@@ -56,3 +56,11 @@ function najit_na_poli($pole, $makacenko) {
     }
     return null ;
 }
+
+function md5_pole_souboru(array $soubory): string {
+    $kumulace = "" ;
+    foreach ($soubory as $soubor) {
+        $kumulace .= md5_file($soubor) ;
+    }
+    return md5($kumulace) ;
+}

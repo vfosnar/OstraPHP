@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/bin/php
 <?php
 
 require_once "nastroje.php" ;
@@ -70,14 +70,6 @@ function vylistovat_ophp_soubory(string $slozka): array {
     return $ophp_soubory ;
 }
 
-function md5_listu_souboru(array $soubory): string {
-    $kumulace = "" ;
-    foreach ($soubory as $soubor) {
-        $kumulace .= md5_file($soubor) ;
-    }
-    return md5($kumulace) ;
-}
-
 function kompilovat(string $zdrojova_slozka, string $vystupni_slozka, array $ophp_soubory, bool $slitovani): void {
     echo "transpilování...\n" ;
 
@@ -109,7 +101,7 @@ if ($monitorovani) {
     while (true) {
         $ophp_soubory = vylistovat_ophp_soubory($zdrojova_slozka) ;
 
-        $novy_hash = md5_listu_souboru($ophp_soubory) ;
+        $novy_hash = md5_pole_souboru($ophp_soubory) ;
         if ($hash !== $novy_hash) {
             kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $slitovani) ;
             $hash = $novy_hash ;

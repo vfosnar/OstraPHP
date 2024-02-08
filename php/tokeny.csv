@@ -1,13 +1,34 @@
+//
+// Zdroje překladů:
+// https://github.com/tkohout/OSTRAJava
+// https://cestina20.cz/
+// https://www.vysokeskoly.cz/clanek/cajzli-arab-oharek-aneb-jak-porozumet-svym-spoluzakum-z-moravy
+// https://images.uncyclomedia.co/necyklopedie/cs/7/70/Ostrav%C5%A1tina_snadno_a_rychle.pdf
+//
+// Každý záznam má vždy minimálně 2 sloupce.
+// Vyřazený token má ve 3. sloupci určený náhradní token.
+//
+// <OstraPHP token>, <PHP token>[, <náhradní token>]
+//
+// Tokeny jsou rozděleny do kategorií.
+// Ty jsou pak alfabeticky seřazeny podle PHP tokenu.
+// Nevyřazená definice má přednost.
+//
 
 pyco,       ;
-spocitej,   count
+rachuj,     count
+spocitej,   count,  rachuj
 toz,        define
-zomri,      die
+chlampaj,   die
+zomri,      die,    chlampaj
 chuj,       null
 ostrihej,   trim
 
-vyzaduj,        require
-vyzaduj_jednou, require_once
+// načítání PHP souborů
+chcu,           require
+chcu_jednou,    require_once
+vyzaduj,        require,        chcu
+vyzaduj_jednou, require_once,   chcu_jednou
 
 // funkce
 makacenko,  function
@@ -25,19 +46,27 @@ konci_dryst,    str_ends_with
 
 // pole
 pole,               array
-je_klic_na_poli,    array_key_exists
-pole_ma_klic,       array_key_exists, je_klic_na_poli
-hod_na_pole,        array_push
+vylystovat_z_pole,  array_filter
+je_klyc_na_poly,    array_key_exists
+je_klic_na_poli,    array_key_exists,   je_klyc_na_poly
+pole_ma_klic,       array_key_exists,   je_klyc_na_poly
+hod_do_pola,        array_push
+hod_na_pole,        array_push,         hod_do_pola
 seber_z_pole,       array_pop
-je_vec_na_poli,     in_array
-pole_ma_hodnotu,    in_array, je_vec_na_poli
+je_vec_na_poly,     in_array
+je_vec_na_poli,     in_array,           je_vec_na_poly
+pole_ma_hodnotu,    in_array,           je_vec_na_poly
+stumedluj,          sort
 
-roztahni,   explode
+rnuj,       explode
+roztahni,   explode,    rnuj
 zmackni,    implode
 
 // vstup/výstup
-citaj, file_get_contents
-pisaj, file_put_contents
+cekni,          file_exists
+citaj,          file_get_contents
+pisaj,          file_put_contents
+zrob_slozku,    mkdir
 
 // čísla
 cyslo_desetinne,    float
@@ -60,6 +89,7 @@ vycet,      enum
 pro,        for
 kazdy,      foreach
 kaj,        if
+bacias,     sleep
 rubat,      while
 
 // klíčová slova spojená s OOP
@@ -67,7 +97,8 @@ $joch,      $this
 __rynek,    __construct
 tryda,      class
 fagan_od,   extends
-statni,     global
+gront,      global
+statni,     global,         gront
 kuka,       implements
 mezigzycht, interface
 zrob,       new

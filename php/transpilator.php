@@ -64,7 +64,7 @@ class Transpilator {
         $this->vystupny_php_kod = $ostraphp_kod ;
     }
 
-    function transpilovat(IZvladacOznameni $zvladac_php_tokenu): string {
+    function transpilovat(IZvladacOznameni $zvladac_oznameni): string {
         global $mapa_tokenu ;
 
         foreach ($this->tokeny as $token) {
@@ -75,7 +75,7 @@ class Transpilator {
                 $mapovany_token = $mapa_tokenu[$token->text] ;
 
                 if ($mapovany_token->nahradni_token !== null)
-                    $zvladac_php_tokenu->zvladnout_vyrazeny_token($token, $mapovany_token->nahradni_token) ;
+                    $zvladac_oznameni->zvladnout_vyrazeny_token($token, $mapovany_token->nahradni_token) ;
 
                 $this->nahrad_token_ve_vystupu(
                     $token->pos,
@@ -83,7 +83,7 @@ class Transpilator {
                     $mapovany_token->php_token
                 ) ;
             } else if (najit_na_poli($mapa_tokenu, function($prvek) use ($token) { return $prvek->php_token === $token->text ; })) {
-                $zvladac_php_tokenu->zvladnout_cenzurovany_php_token($token) ;
+                $zvladac_oznameni->zvladnout_cenzurovany_php_token($token) ;
             }
         }
 
