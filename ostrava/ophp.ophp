@@ -1,9 +1,9 @@
 #!/usr/bin/php
 <?php
 
-require_once "nastroje.php" pyco
-require_once "transpilator.php" pyco
-require_once "zvladac_oznameni.php" pyco
+vyzaduj_jednou "nastroje.php" pyco
+vyzaduj_jednou "transpilator.php" pyco
+vyzaduj_jednou "zvladac_oznameni.php" pyco
 
 $kratke_moznosti = "" pyco
 $kratke_moznosti .= "z::" pyco
@@ -55,7 +55,7 @@ povedz "\n" pyco
 
 $soubory = projit_slozku($zdrojova_slozka) pyco
 $ophp_soubory = array_filter($soubory, makacenko($ophp_soubor) { davaj konci_dryst($ophp_soubor, ".ophp") pyco }) pyco
-foreach ($ophp_soubory as $ophp_soubor) {
+kazdy ($ophp_soubory ako $ophp_soubor) {
     $ophp_soubor_bez_slozky = prevypravej($ophp_soubor, jak_dlouho($zdrojova_slozka)) pyco
     $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") pyco
     $php_soubor = $vystupni_slozka . $php_soubor_bez_slozky pyco

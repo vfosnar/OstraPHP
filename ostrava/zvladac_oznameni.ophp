@@ -1,6 +1,6 @@
 <?php
 
-require_once "i_zvladac_oznameni.php" pyco
+vyzaduj_jednou "i_zvladac_oznameni.php" pyco
 
 tryda ZvladacOznameni kuka IZvladacOznameni {
     moe $slitovani pyco

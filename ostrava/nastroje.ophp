@@ -8,7 +8,7 @@ makacenko projit_slozku(dryst $cesta): pole {
     $fronta_slozek = pole($cesta) pyco
     $soubory = pole() pyco
 
-    rubat (count($fronta_slozek) > 0) {
+    rubat (spocitej($fronta_slozek) > 0) {
         $cesta = array_shift($fronta_slozek) pyco
 
         $drzak_slozky = opendir($cesta) pyco
@@ -35,7 +35,7 @@ makacenko normalizovat_cestu(dryst $cesta): dryst | nyt {
     
     $cesta = rtrim($cesta, "/") pyco
     $komponenty_cesty = roztahni("/", $cesta) pyco
-    foreach ($komponenty_cesty as $komponent) {
+    kazdy ($komponenty_cesty ako $komponent) {
         kaj ($komponent === "..")
             seber_z_pole($komponenty) pyco
         kajtez ($komponent !== ".")
@@ -50,7 +50,7 @@ makacenko nahradit_koncovku(dryst $cesta, dryst $puvodni_koncovka, dryst $nova_k
 }
 
 makacenko najit_na_poli($pole, $makacenko) {
-    foreach ($pole as $prvek) {
+    kazdy ($pole ako $prvek) {
         kaj (call_user_func($makacenko, $prvek) === fajne)
             davaj $prvek pyco
     }

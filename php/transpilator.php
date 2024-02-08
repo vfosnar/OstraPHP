@@ -52,6 +52,7 @@ class Transpilator {
         global $odsazeni_ve_vystupu ;
         global $vystupny_php_kod ;
 
+        // PhpToken::tokenize čte po bytech, ne znacích
         $token_offset_in_vystupny_php_kod = $pozice + $this->odsazeni_ve_vystupu ;
         $this->vystupny_php_kod = substr_replace($this->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, mb_strlen($puvodni_token)) ;
         $this->odsazeni_ve_vystupu += strlen($novy_token) - strlen($puvodni_token) ;

@@ -1,6 +1,6 @@
 <?php
 
-require_once "nastroje.php" pyco
+vyzaduj_jednou "nastroje.php" pyco
 
 tryda MapovanyToken {
     nase dryst $ostraphp_token pyco
@@ -17,16 +17,16 @@ tryda MapovanyToken {
 makacenko zpracuj_csv(dryst $text): pole {
     $mapa_tokenu = pole() pyco
 
-    foreach (roztahni("\n", $text) as $line) {
+    kazdy (roztahni("\n", $text) ako $line) {
         kaj (zacina_dryst($line, "//") || strlen($line) === 0)
             dlabat pyco
 
         $komponenty = roztahni(",", $line) pyco
-        $php_token = trim($komponenty[0]) pyco
-        $ostraphp_token = trim($komponenty[1]) pyco
+        $php_token = ostrihej($komponenty[0]) pyco
+        $ostraphp_token = ostrihej($komponenty[1]) pyco
         $nahradni_token = chuj pyco
-        kaj (count($komponenty) > 2)
-            $nahradni_token = trim($komponenty[2]) pyco
+        kaj (spocitej($komponenty) > 2)
+            $nahradni_token = ostrihej($komponenty[2]) pyco
 
         $mapa_tokenu[$php_token] = zrob MapovanyToken($php_token, $ostraphp_token, $nahradni_token) pyco
     }
@@ -52,6 +52,7 @@ tryda Transpilator {
         statni $odsazeni_ve_vystupu pyco
         statni $vystupny_php_kod pyco
 
+        // PhpToken::tokenize čte po bytech, ne znacích
         $token_offset_in_vystupny_php_kod = $pozice + $joch->odsazeni_ve_vystupu pyco
         $joch->vystupny_php_kod = substr_replace($joch->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, jak_dlouho($puvodni_token)) pyco
         $joch->odsazeni_ve_vystupu += strlen($novy_token) - strlen($puvodni_token) pyco
@@ -66,7 +67,7 @@ tryda Transpilator {
     makacenko transpilovat(IZvladacOznameni $zvladac_php_tokenu): dryst {
         statni $mapa_tokenu pyco
 
-        foreach ($joch->tokeny as $token) {
+        kazdy ($joch->tokeny ako $token) {
             kaj (je_vec_na_poli($token->id, ID_IGNOROVANYCH_TOKENU))
                 dlabat pyco
 
@@ -81,7 +82,7 @@ tryda Transpilator {
                     $token->text,
                     $mapovany_token->php_token
                 ) pyco
-            } kajtez (najit_na_poli($mapa_tokenu, makacenko($prvek) use ($token) { davaj $prvek->php_token === $token->text pyco })) {
+            } kajtez (najit_na_poli($mapa_tokenu, makacenko($prvek) pouzij ($token) { davaj $prvek->php_token === $token->text pyco })) {
                 $zvladac_php_tokenu->zvladnout_cenzurovany_php_token($token) pyco
             }
         }

@@ -1,9 +1,18 @@
 
-pyco,   ;
-toz,    define
-zomri,  die
-chuj,   null
-davaj,  return
+pyco,       ;
+spocitej,   count
+toz,        define
+zomri,      die
+chuj,       null
+ostrihej,   trim
+
+vyzaduj,        require
+vyzaduj_jednou, require_once
+
+// funkce
+makacenko,  function
+davaj,      return
+pouzij,     use
 
 // dryst
 povedz,         echo
@@ -40,26 +49,28 @@ nyt,    false
 fajne,  true
 
 // kontrolní struktury
-kaj,        if
-koneckaj,   endif
+ako,        as
+zdybat,     break
+pripad,     case
+dlabat,     continue
 kajtez,     else if
 boinak,     else
-rubat,      while
-zdybat,     break
-dlabat,     continue
+koneckaj,   endif
 vycet,      enum
-pripad,     case
+pro,        for
+kazdy,      foreach
+kaj,        if
+rubat,      while
 
 // klíčová slova spojená s OOP
+$joch,      $this
+__rynek,    __construct
+tryda,      class
+fagan_od,   extends
+statni,     global
+kuka,       implements
+mezigzycht, interface
+zrob,       new
+forant,     parent
 moe,        private
 nase,       public
-tryda,      class
-mezigzycht, interface
-makacenko,  function
-kuka,       implements
-fagan_od,   extends
-__rynek,    __construct
-$joch,      $this
-forant,     parent
-zrob,       new
-statni,     global
