@@ -20,9 +20,9 @@ přímé použití z terminálu přidejte cestu `~/.composer/vendor/bin` do `PAT
 ## Přispívání překladů
 
 Existující překlady si můžete prohlédnout
-[zde](https://gitlab.com/vfosnar/ostraphp/-/blob/main/php/tokeny.csv). Dalším
-překladům a případným opravám jsme otevřeni. Stačí vytvořit novou issue, PR,
-nebo mě návrh [jakkoliv pošlete](https://vfosnar.cz/) ;)
+[zde](https://gitlab.com/vfosnar/ostraphp/-/blob/main/php/tokeny.csv?plain=1).
+Dalším překladům a případným opravám jsme otevřeni. Stačí vytvořit novou issue,
+PR, nebo mě návrh [jakkoliv pošlete](https://vfosnar.cz/) ;)
 
 ## Vývoj
 
