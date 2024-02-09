@@ -18,10 +18,8 @@
 pyco,       ;
 $_BEBECHY,  $_POST
 rachuj,     count
-spocitej,   count,  rachuj
 toz,        define
 chlampaj,   die
-zomri,      die,    chlampaj
 je,         isset
 chuj,       null
 ostrihej,   trim
@@ -29,8 +27,6 @@ ostrihej,   trim
 // načítání PHP souborů
 chcu,           require
 chcu_jednou,    require_once
-vyzaduj,        require,        chcu
-vyzaduj_jednou, require_once,   chcu_jednou
 
 // funkce
 makacenko,  function
@@ -40,7 +36,6 @@ pouzij,     use
 // dryst
 povedz,         echo
 citaj_dryst,    mb_strlen
-jak_dlouho,     mb_strlen,          citaj_dryst
 prevypravej,    mb_substr
 dryst,          string
 cotoe,          var_dump
@@ -55,18 +50,12 @@ prevypravej_bayty,  substr_replace
 pole,               array
 vylystovat_z_pole,  array_filter
 je_klyc_na_poly,    array_key_exists
-je_klic_na_poli,    array_key_exists,   je_klyc_na_poly
-pole_ma_klic,       array_key_exists,   je_klyc_na_poly
 hod_do_pola,        array_push
-hod_na_pole,        array_push,         hod_do_pola
 seber_z_pole,       array_pop
 je_vec_na_poly,     in_array
-je_vec_na_poli,     in_array,           je_vec_na_poly
-pole_ma_hodnotu,    in_array,           je_vec_na_poly
 stumedluj,          sort
 
 rnuj,       explode
-roztahni,   explode,    rnuj
 zmackni,    implode
 
 // vstup/výstup
@@ -76,7 +65,6 @@ pisaj,          file_put_contents
 je_kisna,       is_dir
 je_bichla,      is_file
 zrob_kisnu,     mkdir
-zrob_slozku,    mkdir,              zrob_kisnu
 
 // čísla
 cyslo_desetinne,    float
@@ -108,7 +96,6 @@ __rynek,    __construct
 tryda,      class
 fagan_od,   extends
 gront,      global
-statni,     global,         gront
 kuka,       implements
 mezigzycht, interface
 zrob,       new
