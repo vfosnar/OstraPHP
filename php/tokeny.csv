@@ -16,11 +16,13 @@
 //
 
 pyco,       ;
+$_BEBECHY,  $_POST
 rachuj,     count
 spocitej,   count,  rachuj
 toz,        define
 chlampaj,   die
 zomri,      die,    chlampaj
+je,         isset
 chuj,       null
 ostrihej,   trim
 
@@ -42,6 +44,7 @@ jak_dlouho,     mb_strlen,          citaj_dryst
 prevypravej,    mb_substr
 dryst,          string
 cotoe,          var_dump
+oprav_dryst,    str_replace
 zacina_dryst,   str_starts_with
 konci_dryst,    str_ends_with
 
