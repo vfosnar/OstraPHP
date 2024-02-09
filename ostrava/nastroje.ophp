@@ -13,7 +13,7 @@ makacenko projit_slozku(dryst $cesta): pole {
 
         $drzak_slozky = opendir($cesta) pyco
         rubat (($predmet = readdir($drzak_slozky)) !== nyt) {
-            kaj ($predmet === "." || $predmet === "..")
+            kaj ($predmet === "." ci $predmet === "..")
                 dlabat pyco
 
             $cesta_predmetu = $cesta . "/" . $predmet pyco
@@ -46,7 +46,7 @@ makacenko normalizovat_cestu(dryst $cesta): dryst | nyt {
 }
 
 makacenko nahradit_koncovku(dryst $cesta, dryst $puvodni_koncovka, dryst $nova_koncovka): dryst {
-    davaj prevypravej($cesta, 0, citaj_dryst($cesta) - citaj_dryst($puvodni_koncovka)) . $nova_koncovka pyco
+    davaj prevypravej($cesta, 0, rachuj_dryst($cesta) - rachuj_dryst($puvodni_koncovka)) . $nova_koncovka pyco
 }
 
 makacenko najit_na_poli($pole, $makacenko) {

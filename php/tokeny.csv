@@ -35,7 +35,8 @@ pouzij,     use
 
 // dryst
 povedz,         echo
-citaj_dryst,    mb_strlen
+rachuj_dryst,   mb_strlen
+citaj_dryst,    mb_strlen,          rachuj_dryst
 prevypravej,    mb_substr
 dryst,          string
 cotoe,          var_dump
@@ -43,7 +44,8 @@ oprav_dryst,    str_replace
 zacina_dryst,   str_starts_with
 konci_dryst,    str_ends_with
 
-citaj_bayty,        strlen
+rachuj_bayty,       strlen
+citaj_bayty,        strlen,         rachuj_bayty
 prevypravej_bayty,  substr_replace
 
 // pole
@@ -74,6 +76,8 @@ cyslo,              int
 bul,    bool
 nyt,    false
 fajne,  true
+aj,     &&
+ci,     ||
 
 // kontrolní struktury
 ako,        as

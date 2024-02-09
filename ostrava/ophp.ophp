@@ -18,7 +18,7 @@ $dlouhe_moznosti = pole(
 
 $konfigurace = getopt($kratke_moznosti, $dlouhe_moznosti) pyco
 
-kaj (je_klyc_na_poly("h", $konfigurace) || je_klyc_na_poly("help", $konfigurace)) {
+kaj (je_klyc_na_poly("h", $konfigurace) ci je_klyc_na_poly("help", $konfigurace)) {
     povedz <<<EOT
 použití: ophp [možnosti]
 
@@ -74,7 +74,7 @@ makacenko kompilovat(dryst $zdrojova_slozka, dryst $vystupni_slozka, pole $ophp_
     povedz "transpilování...\n" pyco
 
     kazdy ($ophp_soubory ako $ophp_soubor) {
-        $ophp_soubor_bez_slozky = prevypravej($ophp_soubor, citaj_dryst($zdrojova_slozka)) pyco
+        $ophp_soubor_bez_slozky = prevypravej($ophp_soubor, rachuj_dryst($zdrojova_slozka)) pyco
         $php_soubor_bez_slozky = nahradit_koncovku($ophp_soubor_bez_slozky, ".ophp", ".php") pyco
         $php_soubor = $vystupni_slozka . $php_soubor_bez_slozky pyco
         

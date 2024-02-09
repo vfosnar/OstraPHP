@@ -18,7 +18,7 @@ makacenko zpracuj_csv(dryst $text): pole {
     $mapa_tokenu = pole() pyco
 
     kazdy (rnuj("\n", $text) ako $line) {
-        kaj (zacina_dryst($line, "//") || citaj_bayty($line) === 0)
+        kaj (zacina_dryst($line, "//") ci rachuj_bayty($line) === 0)
             dlabat pyco
 
         $komponenty = rnuj(",", $line) pyco
@@ -54,8 +54,8 @@ tryda Transpilator {
 
         // PhpToken::tokenize čte po bytech, ne znacích
         $token_offset_in_vystupny_php_kod = $pozice + $joch->odsazeni_ve_vystupu pyco
-        $joch->vystupny_php_kod = prevypravej_bayty($joch->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, citaj_dryst($puvodni_token)) pyco
-        $joch->odsazeni_ve_vystupu += citaj_bayty($novy_token) - citaj_bayty($puvodni_token) pyco
+        $joch->vystupny_php_kod = prevypravej_bayty($joch->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, rachuj_dryst($puvodni_token)) pyco
+        $joch->odsazeni_ve_vystupu += rachuj_bayty($novy_token) - rachuj_bayty($puvodni_token) pyco
     }
 
     makacenko __rynek(dryst $ostraphp_kod) {
@@ -69,11 +69,11 @@ tryda Transpilator {
 
         $nasleduje_nazev_metody = nyt pyco
         kazdy ($joch->tokeny ako $token) {
-            kaj ($token->id === T_OBJECT_OPERATOR || $token->id === T_NULLSAFE_OBJECT_OPERATOR) {
+            kaj ($token->id === T_OBJECT_OPERATOR ci $token->id === T_NULLSAFE_OBJECT_OPERATOR) {
                 $nasleduje_nazev_metody = fajne pyco
                 dlabat pyco
             }
-            kaj ($nasleduje_nazev_metody && $token->id === T_STRING) {
+            kaj ($nasleduje_nazev_metody aj $token->id === T_STRING) {
                 $nasleduje_nazev_metody = nyt pyco
                 dlabat pyco
             }
