@@ -3,35 +3,31 @@
 chcu_jednou "i_zvladac_oznameni.php" pyco
 
 tryda ZvladacOznameni kuka IZvladacOznameni {
-    moe $slitovani pyco
+    moe $striktni pyco
     moe $prefix pyco
 
-    makacenko __rynek(bul $slitovani, dryst $prefix) {
-        $joch->slitovani = $slitovani pyco
+    makacenko __rynek(bul $striktni, dryst $prefix) {
+        $joch->striktni = $striktni pyco
         $joch->prefix = $prefix pyco
     }
 
     makacenko zvladnout_cenzurovany_php_token(PhpToken $token) {
-        $text = $token->text pyco
-        $line = $token->line pyco
-        $zprava = "Použití zakázaného PHP tokenu \"$text\" na řádku $line\n" pyco
+        $zprava = "Použití zakázaného PHP tokenu \"$token->text\" na řádku $token->line\n" pyco
 
-        kaj ($joch->slitovani) {
-            $joch->vypsat_upozorneni($zprava) pyco
-        } boinak {
+        kaj ($joch->striktni) {
             $joch->vypsat_chybu_a_ukoncit($zprava) pyco
+        } boinak {
+            $joch->vypsat_upozorneni($zprava) pyco
         }
     }
 
     makacenko zvladnout_vyrazeny_token(PhpToken $token, dryst $nahradni_token) {
-        $text = $token->text pyco
-        $line = $token->line pyco
-        $zprava = "Použití vyřazeného tokenu \"$text\" na řádku $line, nahrazuje ho \"$nahradni_token\"\n" pyco
+        $zprava = "Použití vyřazeného tokenu \"$token->text\" na řádku $token->line, nahrazuje ho \"$nahradni_token\"\n" pyco
 
-        kaj ($joch->slitovani) {
-            $joch->vypsat_upozorneni($zprava) pyco
-        } boinak {
+        kaj ($joch->striktni) {
             $joch->vypsat_chybu_a_ukoncit($zprava) pyco
+        } boinak {
+            $joch->vypsat_upozorneni($zprava) pyco
         }
     }
 

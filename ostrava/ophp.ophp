@@ -28,7 +28,7 @@ možnosti:
     -h, --help      Zobrazí tuto nápovědu
     -z              Určí zdrojovou složku s .ophp soubory
     -v              Určí výslednou složku s vygenerovanými .php soubory
-    -s              Mód slitování, vypne cenzuru PHP tokenů
+    -s              Striktní režim, ukončí kompilaci jakmile narazí na chybu
     -m              Monitorování složky, sleduje a transpiluje při změně .ophp souborů
 
 EOT pyco
@@ -53,9 +53,9 @@ makacenko formatovat_bul(bul $bul) {
     davaj $bul ? "fajne" : "nyt" pyco
 }
 
-$slitovani = je_klyc_na_poly("s", $konfigurace) pyco
-$slitovani_text = formatovat_bul($slitovani) pyco
-povedz "mód slitování: $slitovani_text\n" pyco
+$striktni = je_klyc_na_poly("s", $konfigurace) pyco
+$striktni_text = formatovat_bul($striktni) pyco
+povedz "striktní: $striktni_text\n" pyco
 
 $monitorovani = je_klyc_na_poly("m", $konfigurace) pyco
 $monitorovani_text = formatovat_bul($monitorovani) pyco
@@ -70,7 +70,7 @@ makacenko vylistovat_ophp_soubory(dryst $slozka): pole {
     davaj $ophp_soubory pyco
 }
 
-makacenko kompilovat(dryst $zdrojova_slozka, dryst $vystupni_slozka, pole $ophp_soubory, bul $slitovani): void {
+makacenko kompilovat(dryst $zdrojova_slozka, dryst $vystupni_slozka, pole $ophp_soubory, bul $striktni): void {
     povedz "transpilování...\n" pyco
 
     kazdy ($ophp_soubory ako $ophp_soubor) {
@@ -82,7 +82,7 @@ makacenko kompilovat(dryst $zdrojova_slozka, dryst $vystupni_slozka, pole $ophp_
     
         $ophp_kod = citaj($ophp_soubor) pyco
         $transpilator = zrob Transpilator($ophp_kod) pyco
-        $php_kod = $transpilator->transpilovat(zrob ZvladacOznameni($slitovani, $prefix)) pyco
+        $php_kod = $transpilator->transpilovat(zrob ZvladacOznameni($striktni, $prefix)) pyco
     
         $slozka = dirname($php_soubor) pyco
         kaj (!cekni($slozka))
@@ -103,7 +103,7 @@ kaj ($monitorovani) {
 
         $novy_hash = md5_pole_souboru($ophp_soubory) pyco
         kaj ($hash !== $novy_hash) {
-            kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $slitovani) pyco
+            kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $striktni) pyco
             $hash = $novy_hash pyco
         }
 
@@ -111,5 +111,5 @@ kaj ($monitorovani) {
     }
 } boinak {
     $ophp_soubory = vylistovat_ophp_soubory($zdrojova_slozka) pyco
-    kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $slitovani) pyco
+    kompilovat($zdrojova_slozka, $vystupni_slozka, $ophp_soubory, $striktni) pyco
 }
