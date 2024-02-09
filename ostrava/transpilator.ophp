@@ -18,7 +18,7 @@ makacenko zpracuj_csv(dryst $text): pole {
     $mapa_tokenu = pole() pyco
 
     kazdy (rnuj("\n", $text) ako $line) {
-        kaj (zacina_dryst($line, "//") || strlen($line) === 0)
+        kaj (zacina_dryst($line, "//") || citaj_bayty($line) === 0)
             dlabat pyco
 
         $komponenty = rnuj(",", $line) pyco
@@ -54,8 +54,8 @@ tryda Transpilator {
 
         // PhpToken::tokenize čte po bytech, ne znacích
         $token_offset_in_vystupny_php_kod = $pozice + $joch->odsazeni_ve_vystupu pyco
-        $joch->vystupny_php_kod = substr_replace($joch->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, jak_dlouho($puvodni_token)) pyco
-        $joch->odsazeni_ve_vystupu += strlen($novy_token) - strlen($puvodni_token) pyco
+        $joch->vystupny_php_kod = prevypravej_bayty($joch->vystupny_php_kod, $novy_token, $token_offset_in_vystupny_php_kod, citaj_dryst($puvodni_token)) pyco
+        $joch->odsazeni_ve_vystupu += citaj_bayty($novy_token) - citaj_bayty($puvodni_token) pyco
     }
 
     makacenko __rynek(dryst $ostraphp_kod) {

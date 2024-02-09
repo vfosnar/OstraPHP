@@ -17,9 +17,9 @@ makacenko projit_slozku(dryst $cesta): pole {
                 dlabat pyco
 
             $cesta_predmetu = $cesta . "/" . $predmet pyco
-            kaj (is_file($cesta_predmetu))
+            kaj (je_bichla($cesta_predmetu))
                 hod_do_pola($soubory, $cesta_predmetu) pyco
-            kajtez (is_dir($cesta_predmetu))
+            kajtez (je_kisna($cesta_predmetu))
                 hod_do_pola($fronta_slozek, $cesta_predmetu) pyco
         }
         closedir($drzak_slozky) pyco
@@ -46,7 +46,7 @@ makacenko normalizovat_cestu(dryst $cesta): dryst | nyt {
 }
 
 makacenko nahradit_koncovku(dryst $cesta, dryst $puvodni_koncovka, dryst $nova_koncovka): dryst {
-    davaj prevypravej($cesta, 0, jak_dlouho($cesta) - jak_dlouho($puvodni_koncovka)) . $nova_koncovka pyco
+    davaj prevypravej($cesta, 0, citaj_dryst($cesta) - citaj_dryst($puvodni_koncovka)) . $nova_koncovka pyco
 }
 
 makacenko najit_na_poli($pole, $makacenko) {

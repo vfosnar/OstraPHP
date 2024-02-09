@@ -37,12 +37,16 @@ pouzij,     use
 
 // dryst
 povedz,         echo
-jak_dlouho,     mb_strlen
+citaj_dryst,    mb_strlen
+jak_dlouho,     mb_strlen,          citaj_dryst
 prevypravej,    mb_substr
 dryst,          string
 cotoe,          var_dump
 zacina_dryst,   str_starts_with
 konci_dryst,    str_ends_with
+
+citaj_bayty,        strlen
+prevypravej_bayty,  substr_replace
 
 // pole
 pole,               array
@@ -66,7 +70,10 @@ zmackni,    implode
 cekni,          file_exists
 citaj,          file_get_contents
 pisaj,          file_put_contents
-zrob_slozku,    mkdir
+je_kisna,       is_dir
+je_bichla,      is_file
+zrob_kisnu,     mkdir
+zrob_slozku,    mkdir,              zrob_kisnu
 
 // čísla
 cyslo_desetinne,    float
